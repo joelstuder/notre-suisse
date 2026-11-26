@@ -221,6 +221,44 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 @media(max-width:899px){body.cardopen .hunt{display:none}.huntbtn{display:inline-flex}.card h2{font-size:28px}.facts{grid-template-columns:1fr 1fr 1fr}.gal .nv{opacity:1}}
 @media(max-width:600px){.card{max-height:calc(100dvh - 330px)}.heat{left:12px;transform:none;top:calc(max(12px,env(safe-area-inset-top)) + 58px)}.chip span{display:none}.chip{padding:0 10px}.hud{flex-wrap:nowrap}.flag.minor{display:none}.prev{top:auto;bottom:124px;right:auto;left:12px}.tag{font-size:21px}.chip{font-size:14px;min-height:40px}.card{bottom:128px}.card h2{font-size:24px}.slot{width:24px;height:30px;font-size:16px;line-height:26px}.slots{gap:6px 10px}.tile{width:28px;height:32px;font-size:17px;line-height:32px}.book.open{transform:translateX(14%)}}
 @media(prefers-reduced-motion:reduce){.door .leaf,.cover,.book{transition:none}.door.today .leaf,.mon,.cam i{animation:none}.shake,.stamp.slam{animation:none}}
+
+/* ---- photo trouvée : grand format ---- */
+.polaroid.big{width:min(940px,94vw);transform:rotate(-1deg);padding:16px 16px 18px}
+.polaroid.big .ph.photo{aspect-ratio:auto;background:#1a1a1a}
+.polaroid.big .ph.photo img{height:auto;max-height:calc(100dvh - 330px);object-fit:contain}
+.polaroid.big h2{font-size:26px}
+/* ---- album : vue d'une photo en grand + retour sur place ---- */
+.puzzle.album.viewing{width:min(1020px,95vw)}
+.album.viewing .aimg img{max-height:calc(100dvh - 310px)}
+.aview .row{justify-content:center}
+.memo{cursor:pointer}
+.memo .memi{position:relative;display:block;background:#fff;padding:6px 6px 20px;width:132px;box-shadow:0 10px 24px rgba(0,0,0,.35);transform:rotate(-4deg);transform-origin:50% 100%;animation:mpop .9s cubic-bezier(.2,1.5,.4,1) both}
+.memo img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.memo span{position:absolute;left:0;right:0;bottom:4px;text-align:center;font:700 11px/1 Nunito,sans-serif;color:#5d6a5d}
+/* ---- passeport : double page ouverte, les 24 tampons sans défiler ---- */
+.book{width:min(940px,95vw);height:min(620px,calc(100dvh - 170px));aspect-ratio:auto;transform:translateX(-25%);transition:transform 1s}
+.book.open{transform:none}
+.book .page{grid-template-columns:repeat(6,1fr);grid-template-rows:auto repeat(4,1fr);gap:8px 16px;padding:18px 28px 22px;overflow:hidden;container-type:size;align-content:stretch;clip-path:inset(0 0 0 50%);transition:clip-path 1s}
+.book.open .page{clip-path:inset(0 0 0 0)}
+.book .page::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:34px;margin-left:-17px;background:linear-gradient(90deg,transparent,rgba(110,70,30,.2),transparent);pointer-events:none}
+.book .page h3{font-size:16px;margin:0}
+.book .stamp{width:min(100%,calc((100cqh - 90px)/4));justify-self:center;align-self:center;font-size:clamp(9px,1.15cqw,13px);border-width:3px;padding:6px}
+.book .stamp svg{width:54%}
+.book .stamp.e{font-size:clamp(14px,2.2cqw,24px);border-width:2px}
+.book .cover{left:50%;border-radius:4px 12px 12px 4px}
+.book.open .cover{transform:rotateY(-180deg)}
+@media(max-width:700px){.book{height:auto;aspect-ratio:3/4;width:min(340px,86vw);transform:none}.book .page{grid-template-columns:repeat(4,1fr);grid-template-rows:auto;overflow:auto;clip-path:none;container-type:normal}.book .stamp{width:100%;font-size:8px}.book .page::after{display:none}.book .cover{left:0}}
+@media(prefers-reduced-motion:reduce){.book,.book .page{transition:none}}
+/* ---- chargement ---- */
+.vl{display:grid;justify-items:center;gap:12px;font:800 22px/1 "Baloo 2",sans-serif}
+.vl i,.loadp i{width:30px;height:30px;border-radius:50%;border:4px solid rgba(61,85,96,.25);border-top-color:#d52b1e;animation:spin .8s linear infinite}
+.vl span{font:700 14px/1 Nunito,sans-serif;opacity:.8}
+.vl em{display:block;width:220px;height:6px;border-radius:3px;background:rgba(61,85,96,.18);overflow:hidden}
+.vl em u{display:block;height:100%;width:0;background:#d52b1e;transition:width .2s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loadp{position:fixed;z-index:7;top:calc(max(12px,env(safe-area-inset-top)) + 4px);left:50%;transform:translateX(-50%);display:none;align-items:center;gap:10px;background:rgba(20,30,30,.86);color:#fff;font:700 14px/1 Nunito,sans-serif;padding:9px 16px 9px 10px;border-radius:22px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.loadp.show{display:flex}
+.loadp i{width:20px;height:20px;border-width:3px;border-color:rgba(255,255,255,.25);border-top-color:#f2c230}
 </style>
 </head>
 <body>
@@ -231,7 +269,7 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 </header>
 <div class="prev" id="prev"><span id="prevt"></span><label><span id="snowl"></span> <input type="range" id="snowr" min="0" max="24"></label><button id="reset"></button></div>
 <div class="toast" id="toast"></div>
-<div class="vig" id="vig"></div><div class="xh" id="xh" aria-hidden="true"></div>
+<div class="vig" id="vig"></div><div class="xh" id="xh" aria-hidden="true"></div><div class="loadp" id="loadp" aria-live="polite"><i></i><span id="loadpt"></span></div>
 <div class="heat" id="heat" aria-live="polite"><div class="cmp"><svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="#fff" stroke="#c9d1d6" stroke-width="2"/><path id="wedge" d="" fill="var(--hc)" opacity=".85"/><circle cx="27" cy="27" r="5" fill="#fff" stroke="var(--hc)" stroke-width="2.5"/><g id="cmpn"><path d="M27 3l3 6h-6z" fill="#1f2a1f"/></g></svg></div><div class="txt"><span id="heatp"></span><b id="heatl"></b><small id="heatd"></small></div></div>
 <section class="card" id="card" aria-live="polite">
   <button class="x" id="cx" aria-label="×">×</button>
@@ -271,7 +309,7 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 <div class="modal" id="al"><div class="puzzle album" role="dialog" aria-modal="true">
   <h2 id="alt"></h2>
   <div class="agrid" id="agrid"></div>
-  <div class="aview" id="aview" hidden><div class="aimg" id="aimg"></div><p id="acap"></p><button class="btn ghost" id="aback"></button></div>
+  <div class="aview" id="aview" hidden><div class="aimg" id="aimg"></div><p id="acap"></p><div class="row"><button class="btn" id="ago"></button><button class="btn ghost" id="aback"></button></div></div>
   <div class="row"><button class="btn" id="alclose"></button></div>
 </div></div>
 <div class="intro" id="intro"><div class="box">
@@ -280,7 +318,7 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
   <p id="i1"></p><p id="i2"></p>
   <div class="row"><button class="btn" id="go"></button></div>
 </div></div>
-<div class="veil" id="veil">…</div>
+<div class="veil" id="veil"><div class="vl"><i></i><b>Notre Suisse</b><span id="vlp"></span><em><u id="vlb"></u></em></div></div>
 <script src="maplibre-gl.js"></script>
 <script>
 {
@@ -366,7 +404,7 @@ let st={opened:[],found:[],intro:false,lang:'fr',solved:{},pz:{},snowPrev:null};
 try{const s=JSON.parse(localStorage.getItem('notre-suisse-v2')||'null');if(s)st=Object.assign(st,s)}catch(e){}
 const save=()=>{try{localStorage.setItem('notre-suisse-v2',JSON.stringify(st))}catch(e){}};
 const T={fr:{title:'Notre Suisse',msg:'Le message',pass:'Passeport',alb:'Album photo',pfound:'Photo trouvée',pmiss:'Photo à trouver',albnone:'Pas encore trouvée',back:'Retour',to2d:'Vue de dessus',to3d:'Vue en relief',
-  itag:'Calendrier de l\'Avent',ih:'Pour Angie',i1:'Chaque jour jusqu\'à Noël, une porte s\'ouvre sur un endroit de Suisse où je veux t\'emmener quand tu seras là.',i2:'Chaque jour, une photo de nous se cache aussi quelque part en Suisse. Des indices et un thermomètre chaud/froid t\'aident à la trouver. Chaque photo te donne une lettre et un tampon dans ton passeport.',hunt:'La photo du jour se cache quelque part en Suisse.',huntk:d=>`Chasse à la photo · Jour ${d}`,huntb:'Chasse à la photo',cmpb:'Activer la boussole',fs:'Plein écran',fsx:'Quitter le plein écran',nofs:'Le plein écran n\'est pas disponible ici : ouvre la carte dans son propre onglet.',rose:'Glisse autour du cadran pour tourner, clique pour revenir au nord',rotl:'Tourner à gauche',rotr:'Tourner à droite',toHz:'Vue rasante',colday:n=>`Sa couleur se révélera le ${n} décembre.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Un autre indice (${i}/${n})`,tip:'Suis la boussole : elle montre la direction et la distance. Quand elle devient rouge, zoome tout près et cherche l\'appareil photo.',heat:['Glacial','Froid','Frais','Tiède','Chaud','Brûlant','Brûlant, zoome encore'],gauge:d=>`Photo du jour ${d}`,toward:['vers le nord','vers le nord-est',"vers l'est",'vers le sud-est','vers le sud','vers le sud-ouest',"vers l'ouest",'vers le nord-ouest'],dist:k=>k>100?'à plus de 100 km':k<1?'à moins d\'1 km':`à environ ${k} km`,go:'Ouvrir le calendrier',
+  itag:'Calendrier de l\'Avent',ih:'Pour Angie',i1:'Chaque jour jusqu\'à Noël, une porte s\'ouvre sur un endroit de Suisse où je veux t\'emmener quand tu seras là.',i2:'Chaque jour, une photo de nous se cache aussi quelque part en Suisse. Des indices et un thermomètre chaud/froid t\'aident à la trouver. Chaque photo te donne une lettre et un tampon dans ton passeport.',hunt:'La photo du jour se cache quelque part en Suisse.',huntk:d=>`Chasse à la photo · Jour ${d}`,huntb:'Chasse à la photo',cmpb:'Activer la boussole',ago:'Y retourner',loadch:'Chargement de la Suisse',loadpl:'Chargement du lieu',fs:'Plein écran',fsx:'Quitter le plein écran',nofs:'Le plein écran n\'est pas disponible ici : ouvre la carte dans son propre onglet.',rose:'Glisse autour du cadran pour tourner, clique pour revenir au nord',rotl:'Tourner à gauche',rotr:'Tourner à droite',toHz:'Vue rasante',colday:n=>`Sa couleur se révélera le ${n} décembre.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Un autre indice (${i}/${n})`,tip:'Suis la boussole : elle montre la direction et la distance. Quand elle devient rouge, zoome tout près et cherche l\'appareil photo.',heat:['Glacial','Froid','Frais','Tiède','Chaud','Brûlant','Brûlant, zoome encore'],gauge:d=>`Photo du jour ${d}`,toward:['vers le nord','vers le nord-est',"vers l'est",'vers le sud-est','vers le sud','vers le sud-ouest',"vers l'ouest",'vers le nord-ouest'],dist:k=>k>100?'à plus de 100 km':k<1?'à moins d\'1 km':`à environ ${k} km`,go:'Ouvrir le calendrier',
   day:'Jour',again:'Revoir le lieu',overview:'Vue d\'ensemble',dirs:['au nord','au nord-est',"à l'est",'au sud-est','au sud','au sud-ouest',"à l'ouest",'au nord-ouest'],
   clue:(m,d)=>`<strong>Une photo de nous se cache par ici.</strong> Environ ${m} m ${d} du monument. Il faudra zoomer très près pour la voir.`,
   got:l=>`<strong>Photo trouvée.</strong> Ta lettre : ${l}`,ph:d=>`Ici, notre photo n°${d} et un petit mot`,letter:'Lettre trouvée',cont:'Continuer',
@@ -374,7 +412,7 @@ const T={fr:{title:'Notre Suisse',msg:'Le message',pass:'Passeport',alb:'Album p
   prev:'Aperçu',snow:'Neige : jour',reset:'Réinitialiser',pzt:'Le message',pzp:'Glisse les lettres dans les cases. Chaque couleur de case est un mot, et la couleur d\'une lettre se révèle 5 jours après sa découverte.',none:'Pas encore de lettre : trouve les photos cachées.',clear:'Tout retirer',close:'Fermer',wrong:'Pas encore, essaie un autre ordre',win:'Joyeux Noël, mon amour.',
   ppc:'PASSEPORT',pps:'NOTRE SUISSE',pph:'Visas',tomorrow:'À demain !',next:'Une autre porte t\'attend',xmas:'Joyeux Noël !',loading:'Chargement de la carte…'},
  en:{title:'Our Switzerland',msg:'The message',pass:'Passport',alb:'Photo album',pfound:'Photo found',pmiss:'Photo to find',albnone:'Not found yet',back:'Back',to2d:'Top view',to3d:'3D view',
-  itag:'Advent calendar',ih:'For Angie',i1:'Every day until Christmas, a door opens on a place in Switzerland where I want to take you once you\'re here.',i2:'Every day, a photo of us is also hidden somewhere in Switzerland. Hints and a hot/cold thermometer help you find it. Each photo gives you a letter and a stamp in your passport.',hunt:'Today\'s photo is hidden somewhere in Switzerland.',huntk:d=>`Photo hunt · Day ${d}`,huntb:'Photo hunt',cmpb:'Turn on the compass',fs:'Full screen',fsx:'Exit full screen',nofs:'Full screen isn\'t available here: open the map in its own tab.',rose:'Drag around the dial to turn, click to face north',rotl:'Turn left',rotr:'Turn right',toHz:'Horizon view',colday:n=>`Its colour will show on December ${n}.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Another hint (${i}/${n})`,tip:'Follow the compass: it shows the direction and the distance. When it turns red, zoom right in and look for the camera.',heat:['Freezing','Cold','Cool','Warm','Hot','Burning','Burning, zoom in more'],gauge:d=>`Day ${d} photo`,toward:['to the north','to the north-east','to the east','to the south-east','to the south','to the south-west','to the west','to the north-west'],dist:k=>k>100?'more than 100 km away':k<1?'less than 1 km away':`about ${k} km away`,go:'Open the calendar',
+  itag:'Advent calendar',ih:'For Angie',i1:'Every day until Christmas, a door opens on a place in Switzerland where I want to take you once you\'re here.',i2:'Every day, a photo of us is also hidden somewhere in Switzerland. Hints and a hot/cold thermometer help you find it. Each photo gives you a letter and a stamp in your passport.',hunt:'Today\'s photo is hidden somewhere in Switzerland.',huntk:d=>`Photo hunt · Day ${d}`,huntb:'Photo hunt',cmpb:'Turn on the compass',ago:'Take me back there',loadch:'Loading Switzerland',loadpl:'Loading the place',fs:'Full screen',fsx:'Exit full screen',nofs:'Full screen isn\'t available here: open the map in its own tab.',rose:'Drag around the dial to turn, click to face north',rotl:'Turn left',rotr:'Turn right',toHz:'Horizon view',colday:n=>`Its colour will show on December ${n}.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Another hint (${i}/${n})`,tip:'Follow the compass: it shows the direction and the distance. When it turns red, zoom right in and look for the camera.',heat:['Freezing','Cold','Cool','Warm','Hot','Burning','Burning, zoom in more'],gauge:d=>`Day ${d} photo`,toward:['to the north','to the north-east','to the east','to the south-east','to the south','to the south-west','to the west','to the north-west'],dist:k=>k>100?'more than 100 km away':k<1?'less than 1 km away':`about ${k} km away`,go:'Open the calendar',
   day:'Day',again:'Fly back',overview:'Whole map',dirs:['north','north-east','east','south-east','south','south-west','west','north-west'],
   clue:(m,d)=>`<strong>A photo of us is hidden around here.</strong> About ${m} m ${d} of the landmark. You'll need to zoom in very close to spot it.`,
   got:l=>`<strong>Photo found.</strong> Your letter: ${l}`,ph:d=>`Our photo no. ${d} and a little note go here`,letter:'Letter found',cont:'Continue',
@@ -528,15 +566,26 @@ function openPassport(fresh){
   }else{drawPassport(fresh||null);book.classList.add('open');$('pp').classList.add('show');if(fresh){thump();$('ppmsg').textContent=fresh===24?t().xmas:(unlocked(fresh+1)?t().next:t().tomorrow)}}
 }
 function coverMsg(d){const k=d===24?'xmas':(unlocked(d+1)?'next':'tomorrow');$('cvmsg').innerHTML=`<span>${esc(T.fr[k])}</span><span>${esc(T.en[k])}</span>`;$('cvmsg').classList.add('on')}
-function drawAlbum(){$('aview').hidden=true;$('agrid').hidden=false;
+function drawAlbum(){$('al').querySelector('.album').classList.remove('viewing');$('aview').hidden=true;$('agrid').hidden=false;
   $('agrid').innerHTML=DAYS.map(x=>{const f=st.found.includes(x.d),r=((x.d*29)%10)-5;
     if(!f)return `<div class="acell e"><span class="im">${x.d}</span><span>${esc(t().albnone)}</span></div>`;
     const im=x.photo?`<span class="im" style="background-image:url('${esc(x.photo.src)}')"></span>`:'<span class="im ph"></span>';
     return `<button class="acell" style="--r:${r}deg" data-d="${x.d}">${im}<span>${x.d}.12</span></button>`}).join('')}
-$('agrid').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;const x=DAYS[+b.dataset.d-1];
+let alD=null,memo=null;
+function albumView(d){const x=DAYS[d-1];alD=d;
   $('aimg').innerHTML=x.photo?`<img src="${esc(x.photo.src)}" alt="">`:'<div class="ph"></div>';$('acap').textContent=x.photo?x.photo.cap[st.lang]:t().ph(x.d);
-  $('agrid').hidden=true;$('aview').hidden=false});
-$('aback').onclick=()=>{$('aview').hidden=true;$('agrid').hidden=false};
+  set('ago',t().ago);$('ago').hidden=!x.photo;$('al').querySelector('.album').classList.add('viewing');$('agrid').hidden=true;$('aview').hidden=false}
+$('agrid').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(b)albumView(+b.dataset.d)});
+$('aback').onclick=()=>{$('al').querySelector('.album').classList.remove('viewing');$('aview').hidden=true;$('agrid').hidden=false};
+/* retour à l'endroit où la photo a été trouvée : même voyage que pour une case, puis un petit polaroïd-souvenir posé sur place */
+function dropMemo(){if(memo){memo.remove();memo=null}}
+$('ago').onclick=()=>{const x=DAYS[alD-1];if(!x||!x.photo||!map)return;$('al').classList.remove('show');dropMemo();
+  $('card').classList.remove('show');document.body.classList.remove('cardopen');$('hunt').classList.remove('show');
+  const p=x.photo,tg={d:x.d,lon:p.lon,lat:p.lat,zoom:p.zoom??16.4,pitch:p.pitch??58,bearing:p.bearing??((x.d*47)%120)-60,kind:'Photo'};
+  flying=true;heat();const tok=++flyTok,pf=prefetch(tg,true);
+  cine(tg,tok,()=>{flying=false;const el=document.createElement('div');el.className='memo';el.innerHTML=`<span class="memi"><img src="${esc(p.src)}" alt=""><span>${x.d}.12</span></span>`;
+    el.onclick=()=>{set('aback',t().back);drawAlbum();albumView(x.d);$('al').classList.add('show')};
+    memo=new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat([p.lon,p.lat]).addTo(map);chime();toast(p.cap[st.lang])},pf)};
 function fsEl(){return document.fullscreenElement||document.webkitFullscreenElement}
 function fsUpd(){const on=!!fsEl();$('fsp').setAttribute('d',on?'M12 5v7H5M20 5v7h7M12 27v-7H5M20 27v-7h7':'M5 12V5h7M27 12V5h-7M5 20v7h7M27 20v7h-7');$('bfs').title=on?t().fsx:t().fs;$('bfs').setAttribute('aria-label',$('bfs').title)}
 $('bfs').onclick=async()=>{try{if(fsEl())await(document.exitFullscreen||document.webkitExitFullscreen).call(document);else{const r=document.documentElement;await(r.requestFullscreen||r.webkitRequestFullscreen).call(r)}}catch(e){toast(t().nofs)}setTimeout(fsUpd,300)};
@@ -552,6 +601,26 @@ const HOME={center:[8.22,46.76],zoom:7.05+Math.log2(narrow)*.8,pitch:innerWidth<
 let map,mons={},pols={};
 const inZone=c=>true;
 let flying=false,flyTok=0;
+let prefetch=(x,prio)=>({pct:()=>1}),preloadCH=onp=>Promise.resolve();
+/* ---- réseau (site hébergé) : cache mémoire des tuiles + préchargement ---- */
+const NET={b:'https://vectortiles.geo.admin.ch/tiles/ch.swisstopo.base.vt/v1.0.0/',r:'https://vectortiles.geo.admin.ch/tiles/ch.swisstopo.relief.vt/v1.0.0/',t:'https://elevation-tiles-prod.s3.amazonaws.com/terrarium/'},NEXT={b:'.pbf',r:'.pbf',t:'.png'};
+const TC=new Map(),TMAX=4000;
+function tget(k){let q=TC.get(k);if(q){TC.delete(k);TC.set(k,q);return q}
+  const[kd,z,x,y]=k.split('/');q=fetch(NET[kd]+z+'/'+x+'/'+y+NEXT[kd]).then(r=>{if(r.status===204||r.status===404)return null;if(!r.ok)throw new Error('http '+r.status);return r.arrayBuffer()});
+  q.catch(()=>TC.delete(k));TC.set(k,q);if(TC.size>TMAX)TC.delete(TC.keys().next().value);return q}
+maplibregl.addProtocol('net',async p=>{const k=p.url.slice(6),d=await tget(k);if(d===null){if(k[0]==='t')throw new Error('no dem');return{data:new ArrayBuffer(0)}}return{data:d.slice(0)}});
+const tXY=(lon,lat,z)=>{const n=2**z;return[Math.floor((lon+180)/360*n),Math.floor((1-Math.log(Math.tan(lat*Math.PI/180)+1/Math.cos(lat*Math.PI/180))/Math.PI)/2*n)]};
+const PQ=[];let pAct=0;
+function pump(){while(pAct<14&&PQ.length){const it=PQ.shift();pAct++;tget(it.k).catch(()=>{}).finally(()=>{pAct--;it.cb();pump()})}}
+function grab(keys,prio){let n=0;const tot=keys.length||1;const cb=()=>{n++};const items=keys.map(k=>({k,cb}));if(prio)PQ.unshift(...items);else PQ.push(...items);pump();return{pct:()=>n/tot}}
+prefetch=(x,prio)=>{const K=[],add=(kd,z,R)=>{const[cx,cy]=tXY(x.lon,x.lat,z);for(let dy=-R;dy<=R;dy++)for(let dx=-R;dx<=R;dx++)K.push(`${kd}/${z}/${cx+dx}/${cy+dy}`)};
+  /* dans l'ordre de la plongée : des vues larges vers le détail */
+  [[10,2],[11,2],[12,2],[13,3],[14,3]].forEach(([z,R],i)=>{add('b',z,R);add('r',z,R);if(z<14)add('t',Math.min(13,z+1),z<11?2:3)});
+  return grab(K,prio)};
+preloadCH=onp=>new Promise(res=>{const K=[],B=[5.9,45.8,10.55,47.85],box=(kd,z)=>{const[x0,y0]=tXY(B[0],B[3],z),[x1,y1]=tXY(B[2],B[1],z);for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++)K.push(`${kd}/${z}/${x}/${y}`)};
+  for(let z=5;z<=9;z++){box('b',z);box('r',z)}for(let z=6;z<=9;z++)box('t',z);
+  const g=grab(K,false),tick=()=>{const v=g.pct();onp(v);if(v>=.995){res();return}setTimeout(tick,150)};tick()});
+
 const padOf=()=>{if(innerWidth<900)return{bottom:300,top:40,left:0,right:0};const cw=Math.min(540,innerWidth-480);return{right:cw+108,left:innerWidth-88-cw-342<360?20:360,top:40,bottom:140}};
 const camOf=x=>({center:[x.lon,x.lat],zoom:x.zoom??({Sommet:12.6,Nature:13.4,Train:13}[x.kind]||17),pitch:x.pitch??({Sommet:62}[x.kind]||60),bearing:x.bearing??((x.d*47)%120)-60,padding:padOf(),essential:true});
 /* caméra sûre : on vérifie que la ligne de vue entre la caméra et le lieu ne traverse pas le relief.
@@ -599,12 +668,15 @@ function fly(x){map.setMaxZoom(17.6);const tok=++flyTok,near=map.getCenter().dis
   if(near)dive(x,tok,2400,()=>{if(tok===flyTok)lock(x)});
   else{map.flyTo({...safeCam(x),duration:3000,curve:1.5});map.once('moveend',()=>{if(tok===flyTok)lock(x)})}}
 /* le grand voyage : on survole d'abord la région, puis on plonge lentement jusqu'au lieu */
-function cine(x,tok,done){
+function waitPF(pf,tok,cb){const t0=performance.now();const tick=()=>{if(tok!==flyTok){$('loadp').classList.remove('show');return}
+    const p=pf.pct(),dt=performance.now()-t0;if(p>=.97||dt>9000){$('loadp').classList.remove('show');cb();return}
+    if(dt>250){$('loadpt').textContent=`${t().loadpl}… ${Math.round(p*100)} %`;$('loadp').classList.add('show')}setTimeout(tick,120)};tick()}
+function cine(x,tok,done,pf){pf=pf||{pct:()=>1};
   map.setMaxZoom(17.6);
   if(reduce){lock(x,done);return}
   map.flyTo({center:[x.lon,x.lat],zoom:10.3,pitch:45,bearing:0,padding:padOf(),duration:3400,curve:1.42,essential:true});
-  map.once('moveend',()=>{if(tok!==flyTok)return;let go=false;const d=()=>{if(go||tok!==flyTok)return;go=true;map.setMaxZoom(17.6);
-    dive(x,tok,5200,()=>{if(tok===flyTok)lock(x,done)})};map.once('idle',d);setTimeout(d,1500)});
+  map.once('moveend',()=>{if(tok!==flyTok)return;waitPF(pf,tok,()=>{let go=false;const d=()=>{if(go||tok!==flyTok)return;go=true;map.setMaxZoom(17.6);
+    dive(x,tok,5200,()=>{if(tok===flyTok)lock(x,done)})};map.once('idle',d);setTimeout(d,1200)})});
 }
 function chime(){const a=ac();if(!a)return;const t0=a.currentTime;[1046.5,1318.5,1568,2093].forEach((f,i)=>{const o=a.createOscillator();o.type='sine';o.frequency.value=f;env(a,o,t0+i*.09,.12,1.2);o.start(t0+i*.09);o.stop(t0+i*.09+1.3)})}
 function arrive(x){flying=false;const m=mons[x.d];if(m){const el=m.getElement();el.classList.remove('hid');void el.offsetWidth;el.classList.add('arrive');setTimeout(()=>el.classList.remove('arrive'),4200)}
@@ -625,7 +697,7 @@ function findPhoto(x){
   if(fresh){st.found.push(x.d);st.foundOn=st.foundOn||{};st.foundOn[x.d]=todayNum();save()}
   pols[x.d]&&pols[x.d].remove();delete pols[x.d];
   const ph=$('mph');ph.classList.toggle('photo',!!x.photo);if(x.photo){ph.innerHTML=`<img src="${esc(x.photo.src)}" alt="">`;$('mt').textContent=x.photo.cap[st.lang]}else{ph.textContent=t().ph(x.d);$('mt').textContent=L(x).name}$('ml').textContent=letterOf(x.d);$('ml').style.setProperty('--c',tcol(x.d));$('mlc').textContent=shown(x.d)?'':t().colday(foundOn(x.d)+5);
-  $('modal').classList.add('show');drawCounts();drawStrip();heat();if(cur&&cur.d===x.d)$('cc').innerHTML=clue(x);
+  $('modal').querySelector('.polaroid').classList.toggle('big',!!x.photo);$('modal').classList.add('show');drawCounts();drawStrip();heat();if(cur&&cur.d===x.d)$('cc').innerHTML=clue(x);
   pendingStamp=fresh?x.d:null;
 }
 $('mclose').onclick=()=>{$('modal').classList.remove('show');if(pendingStamp){const d=pendingStamp;pendingStamp=null;openPassport(d)}};
@@ -635,8 +707,8 @@ function openDay(d){
   const first=!st.opened.includes(d);
   if(first){st.opened.push(d);save();document.querySelector(`.door[data-d="${d}"]`).classList.add('open');cowbell()}
   $('card').classList.remove('show');document.body.classList.remove('cardopen');$('hunt').classList.remove('show');
-  flying=true;cur=x;heat();addDay(x,true);const tok=++flyTok;
-  setTimeout(()=>{if(tok===flyTok)cine(x,tok,()=>arrive(x))},first?650:150);
+  dropMemo();flying=true;cur=x;heat();addDay(x,true);const tok=++flyTok,pf=prefetch(x,true);
+  setTimeout(()=>{if(tok===flyTok)cine(x,tok,()=>arrive(x),pf)},first?650:150);
   setTimeout(()=>{if(first)drawStrip()},1000);
 }
 /* chaud / froid */
@@ -694,14 +766,17 @@ fetch('manifest.json').then(r=>r.json()).then(m=>{MAN=m;return fetch('style.json
   const box=$('map');
   const zcheck=()=>{const z=map.getZoom();box.style.setProperty('--k',Math.max(.7,Math.min(1.5,.9+(z-7)*.22)).toFixed(3));box.classList.toggle('zoomed',z>=14.3);box.classList.toggle('zoomed2',z>=13.8);box.classList.toggle('hide-flags',z>=9.9||map.getPitch()>66)};
   map.on('load',()=>{map.setTerrain({source:'dem',exaggeration:1.5});applySnow();decorate();zcheck();DAYS.forEach(x=>{if(st.opened.includes(x.d))addDay(x)})});
-  map.once('idle',()=>$('veil').classList.add('off'));
-  setTimeout(()=>$('veil').classList.add('off'),9000);
+  const vOff=()=>$('veil').classList.add('off');let idle=false,pre=false;
+  map.once('idle',()=>{idle=true;if(pre)vOff()});
+  preloadCH(p=>{$('vlp').textContent=`${t().loadch}… ${Math.round(p*100)} %`;$('vlb').style.width=(p*100)+'%'}).finally(()=>{pre=true;if(idle)vOff()});
+  setTimeout(vOff,15000);
   map.on('zoom',zcheck);map.on('pitch',zcheck);
   let hq=0;map.on('move',()=>{if(!hq)hq=requestAnimationFrame(()=>{hq=0;heat()})});
   map.on('moveend',()=>{const m=inZone(map.getCenter())?17.6:11.99;if(map.getMaxZoom()!==m){if(m<16&&map.getZoom()>12.2)toast(t().zoomlim);map.setMaxZoom(m)}zcheck()});
-}).catch(e=>{$('veil').textContent='Erreur / Error'});
+}).catch(e=>{$('vlp').textContent='Erreur / Error'});
 
 $('strip').addEventListener('click',e=>{const b=e.target.closest('.door');if(b)openDay(+b.dataset.d)});
+const hovered=new Set();$('strip').addEventListener('pointerover',e=>{const b=e.target.closest('.door');if(!b)return;const d=+b.dataset.d;if(hovered.has(d)||!unlocked(d))return;hovered.add(d);prefetch(DAYS[d-1],false)});
 $('cx').onclick=()=>{$('card').classList.remove('show');document.body.classList.remove('cardopen')};
 $('cgo').onclick=()=>cur&&fly(cur);
 $('cswiss').onclick=()=>{$('card').classList.remove('show');document.body.classList.remove('cardopen');map.setMaxZoom(11.99);map.flyTo({...HOME,padding:{top:0,bottom:0,left:0,right:0},duration:2600})};
@@ -712,7 +787,7 @@ if(st.intro)$('intro').remove();
 if(PREVIEW){$('prev').classList.add('show');const r=$('snowr');r.value=snowDay();r.oninput=()=>{st.snowPrev=+r.value;save();applySnow()};
   $('reset').onclick=()=>{st={opened:[],found:[],intro:true,lang:st.lang,solved:{},pz:{},snowPrev:null};save();location.reload()}}
 addEventListener('keydown',e=>{if(e.key==='Escape'){if($('lbm').classList.contains('show')){$('lbm').classList.remove('show');return}['modal','pz','pp','al','card'].forEach(id=>$(id).classList.remove('show'));document.body.classList.remove('cardopen')}});
-$('veil').textContent=t().loading;
+$('vlp').textContent=t().loading;
 drawTexts();
 const td=DAYS.find(x=>isToday(x.d));if(td)setTimeout(()=>document.querySelector(`.door[data-d="${td.d}"]`).scrollIntoView({inline:'center',behavior:'smooth'}),400);
 }
