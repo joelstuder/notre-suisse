@@ -264,6 +264,9 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 .teaser.on{opacity:1;transform:translate(-50%,0)}
 .teaser small{display:block;font:800 18px/1 Nunito,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#f2c230;margin-bottom:10px}
 .teaser b{display:block;font:800 clamp(34px,5vw,58px)/1.05 "Baloo 2",sans-serif}
+
+.clouds{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;overflow:hidden;transform-origin:50% 50%;background:radial-gradient(ellipse at 50% 50%,rgba(255,255,255,.55),rgba(240,246,250,.85))}
+.clouds i{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,1),rgba(255,255,255,.85) 40%,rgba(232,240,246,.5) 70%,rgba(255,255,255,0));filter:blur(8px)}
 </style>
 </head>
 <body>
@@ -274,7 +277,7 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 </header>
 <div class="prev" id="prev"><span id="prevt"></span><label><span id="snowl"></span> <input type="range" id="snowr" min="0" max="24"></label><button id="reset"></button></div>
 <div class="toast" id="toast"></div>
-<div class="vig" id="vig"></div><div class="xh" id="xh" aria-hidden="true"></div><div class="teaser" id="teaser" aria-live="polite"><small id="tsd"></small><b id="tsq"></b></div><div class="loadp" id="loadp" aria-live="polite"><i></i><span id="loadpt"></span></div>
+<div class="vig" id="vig"></div><div class="xh" id="xh" aria-hidden="true"></div><div class="clouds" id="clouds" aria-hidden="true"><i style="left:-20%;top:-25%;width:70vmax;height:55vmax"></i><i style="left:35%;top:-30%;width:75vmax;height:60vmax"></i><i style="left:-25%;top:30%;width:65vmax;height:60vmax"></i><i style="left:55%;top:20%;width:70vmax;height:60vmax"></i><i style="left:10%;top:55%;width:80vmax;height:55vmax"></i><i style="left:-10%;top:5%;width:55vmax;height:45vmax"></i><i style="left:45%;top:-5%;width:55vmax;height:50vmax"></i><i style="left:25%;top:25%;width:60vmax;height:50vmax"></i><i style="left:60%;top:60%;width:60vmax;height:50vmax"></i></div><div class="teaser" id="teaser" aria-live="polite"><small id="tsd"></small><b id="tsq"></b></div><div class="loadp" id="loadp" aria-live="polite"><i></i><span id="loadpt"></span></div>
 <div class="heat" id="heat" aria-live="polite"><div class="cmp"><svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="#fff" stroke="#c9d1d6" stroke-width="2"/><path id="wedge" d="" fill="var(--hc)" opacity=".85"/><circle cx="27" cy="27" r="5" fill="#fff" stroke="var(--hc)" stroke-width="2.5"/><g id="cmpn"><path d="M27 3l3 6h-6z" fill="#1f2a1f"/></g></svg></div><div class="txt"><span id="heatp"></span><b id="heatl"></b><small id="heatd"></small></div></div>
 <section class="card" id="card" aria-live="polite">
   <button class="x" id="cx" aria-label="×">×</button>
@@ -689,18 +692,57 @@ function fly(x){map.setMaxZoom(17.6);const tok=++flyTok,near=map.getCenter().dis
 function waitPF(pf,tok,cb){const t0=performance.now();const tick=()=>{if(tok!==flyTok){$('loadp').classList.remove('show');return}
     const p=pf.pct(),dt=performance.now()-t0;if(p>=.97||dt>3500){$('loadp').classList.remove('show');cb();return}
     if(dt>250){$('loadpt').textContent=`${t().loadpl}… ${Math.round(p*100)} %`;$('loadp').classList.add('show')}setTimeout(tick,120)};tick()}
-function orbit(x,tok,next){
-  const Z=HOME.zoom+.15,bT=camOf(x).bearing,n=((bT%360)+540)%360-180;let R=360+n;if(R<240)R+=360;
-  const dur=Math.max(6000,Math.min(9500,7600*R/360)),ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
-  $('tsd').textContent=t().tsd(x.d);$('tsq').textContent=t().tsq;setTimeout(()=>{if(tok===flyTok)$('teaser').classList.add('on')},500);
-  map.easeTo({center:[8.23,46.80],zoom:Z,pitch:50,bearing:0,padding:{top:0,bottom:0,left:0,right:0},duration:1800,essential:true});
+/* ---------- le vol d'oiseau du jour ----------
+   ~10 s de survol de la Suisse, nord en haut, en zigzag, avec l'inclinaison dans les virages ;
+   puis une seule descente continue (~9,5 s) qui ralentit comme un atterrissage, à travers une couche de nuages
+   au moment où la carte prépare le détail. Le parcours change chaque jour (sens est→ouest ou ouest→est, zigzag tiré au sort). */
+const rng=seed=>()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646};
+function birdPath(x){const r=rng(x.d*7919+13);let dir=x.d%2?-1:1;               // -1 : depuis l'est, 1 : depuis l'ouest
+  let sx=dir>0?6.15+r()*.25:10.15-r()*.3;if(Math.abs(x.lon-sx)<1.3){dir=-dir;sx=dir>0?6.15+r()*.25:10.15-r()*.3}
+  const P=[[sx,46.25+r()*1.0]],n=Math.abs(x.lon-sx)>2.4?3:2;let sg=r()<.5?1:-1;
+  for(let i=1;i<=n;i++){const f=i/(n+1);P.push([sx+(x.lon-sx)*f+(r()-.5)*.25,Math.max(45.98,Math.min(47.6,46.78+sg*(.32+r()*.3)))]);sg=-sg}
+  P.push([x.lon,x.lat]);return P}
+function spline(P){const M=P.map(p=>maplibregl.MercatorCoordinate.fromLngLat(p)),Q=[M[0],...M,M[M.length-1]],S=[];
+  for(let i=1;i<Q.length-2;i++){const[p0,p1,p2,p3]=[Q[i-1],Q[i],Q[i+1],Q[i+2]];
+    for(let k=0;k<60;k++){const t=k/60,t2=t*t,t3=t2*t,f=(a,b,c,d)=>.5*(2*b+(-a+c)*t+(2*a-5*b+4*c-d)*t2+(-a+3*b-3*c+d)*t3);S.push([f(p0.x,p1.x,p2.x,p3.x),f(p0.y,p1.y,p2.y,p3.y)])}}
+  S.push([Q[Q.length-2].x,Q[Q.length-2].y]);const L=[0];for(let i=1;i<S.length;i++)L.push(L[i-1]+Math.hypot(S[i][0]-S[i-1][0],S[i][1]-S[i-1][1]));
+  const tot=L[L.length-1];
+  return s=>{s=Math.max(0,Math.min(1,s))*tot;let lo=0,hi=L.length-1;while(hi-lo>1){const m=(lo+hi)>>1;if(L[m]<s)lo=m;else hi=m}
+    const k=(s-L[lo])/((L[hi]-L[lo])||1),a=S[lo],b=S[hi];return{x:a[0]+(b[0]-a[0])*k,y:a[1]+(b[1]-a[1])*k,h:Math.atan2(b[1]-a[1],b[0]-a[0])}}}
+/* zoom pendant la descente : interpolation monotone (pas de rebond), lente au début et à la fin */
+function mono(X,Y){const n=X.length,d=[],m=[];for(let i=0;i<n-1;i++)d.push((Y[i+1]-Y[i])/(X[i+1]-X[i]));
+  m[0]=0;m[n-1]=0;for(let i=1;i<n-1;i++)m[i]=d[i-1]*d[i]<=0?0:3*(X[i+1]-X[i-1])/((2*X[i+1]-X[i]-X[i-1])/d[i-1]+(X[i+1]+X[i]-2*X[i-1])/d[i]);
+  return u=>{let i=0;while(i<n-2&&u>X[i+1])i++;const h=X[i+1]-X[i],t=(u-X[i])/h,t2=t*t,t3=t2*t;
+    return(2*t3-3*t2+1)*Y[i]+(t3-2*t2+t)*h*m[i]+(-2*t3+3*t2)*Y[i+1]+(t3-t2)*h*m[i+1]}}
+const ZF=mono([0,.3,.5,.66,.82,1],[0,.27,.51,.67,.86,1]),sm=k=>k*k*(3-2*k);
+let symHidden=null;
+function labels(on){if(!map)return;if(!on&&!symHidden){symHidden=map.getStyle().layers.filter(l=>l.type==='symbol'&&(l.layout||{}).visibility!=='none').map(l=>l.id);symHidden.forEach(id=>map.setLayoutProperty(id,'visibility','none'))}
+  else if(on&&symHidden){symHidden.forEach(id=>{try{map.setLayoutProperty(id,'visibility','visible')}catch(e){}});symHidden=null}}
+function clouds(a,q){const c=$('clouds');c.style.opacity=a.toFixed(3);c.style.transform=`scale(${(1+1.7*q).toFixed(3)})`}
+function flight(x,tok,done){
+  const pad=padOf(),z0=HOME.zoom+1.2,TF=10000,TD=9500,pos=spline(birdPath(x)),v=1/(TF+TD/4),sQ=v*TF;
+  let c=safeCam(x),E0=900,eT=null,stop=false,roll=0,started=false;const halt=()=>{stop=true};
+  const p0=pos(0),st0=new maplibregl.MercatorCoordinate(p0.x,p0.y).toLngLat();
+  $('tsd').textContent=t().tsd(x.d);$('tsq').textContent=t().tsq;setTimeout(()=>{if(tok===flyTok)$('teaser').classList.add('on')},700);
+  map.setMaxZoom(17.6);map.easeTo({center:st0,zoom:z0,pitch:50,bearing:0,roll:0,padding:pad,duration:2200,essential:true});
   map.once('moveend',()=>{if(tok!==flyTok){$('teaser').classList.remove('on');return}
-    let stop=false;const halt=()=>{stop=true};map.on('dragstart',halt);map.on('wheel',halt);map.on('touchstart',halt);
-    const t0=performance.now(),step=now=>{if(tok!==flyTok){fin(false);return}const k=Math.min(1,(now-t0)/dur),e=ease(k);
-      if(!stop)map.jumpTo({bearing:R*e,zoom:Z+.35*Math.sin(Math.PI*e),pitch:50+8*e});
-      if(k>.72)$('teaser').classList.remove('on');
-      if(k<1&&!stop)requestAnimationFrame(step);else fin(true)};
-    const fin=go=>{map.off('dragstart',halt);map.off('wheel',halt);map.off('touchstart',halt);$('teaser').classList.remove('on');if(go)next()};
+    map.on('dragstart',halt);map.on('wheel',halt);map.on('touchstart',halt);map.setCenterClampedToGround(false);E0=map.transform.elevation||900;
+    const t0=performance.now();let lastH=null;
+    const fin=()=>{map.off('dragstart',halt);map.off('wheel',halt);map.off('touchstart',halt);$('teaser').classList.remove('on');clouds(0,0);
+      map.jumpTo({roll:0});lock(x,()=>{labels(true);done()})};
+    const step=now=>{if(tok!==flyTok){clouds(0,0);labels(true);return}if(stop){fin();return}
+      const tt=now-t0;let s,u=-1;
+      if(tt<TF)s=v*tt;else{u=Math.min(1,(tt-TF)/TD);s=sQ+(1-sQ)*(1-Math.pow(1-u,4));if(!started){started=true;labels(false);c=safeCam(x)}}
+      const p=pos(Math.min(s,1)),ctr=new maplibregl.MercatorCoordinate(p.x,p.y).toLngLat();
+      /* inclinaison : proportionnelle à la vitesse de virage, lissée */
+      if(lastH!==null){let dh=p.h-lastH;dh=Math.atan2(Math.sin(dh),Math.cos(dh));const target=Math.max(-14,Math.min(14,dh*900));roll+=(target-roll)*.06}lastH=p.h;
+      let zoom=z0+.25*Math.sin(Math.min(1,tt/TF)*Math.PI),pitch=50,bearing=0,elev=E0,rl=roll;
+      if(u>=0){const g=groundAt(x.lon,x.lat);if(g)eT=g;const k=sm(u);zoom=z0+(c.zoom-z0)*ZF(u);pitch=50+(c.pitch-50)*k;bearing=(((c.bearing%360)+540)%360-180)*k;
+        elev=E0+((eT??E0)-E0)*k;rl=roll*(1-sm(Math.min(1,u*2.5)));
+        const a=u<.2?0:u<.32?sm((u-.2)/.12):u<.46?1:u<.6?1-sm((u-.46)/.14):0;clouds(a*.96,Math.max(0,Math.min(1,(u-.2)/.4)))}
+      if(tt>TF-1200)$('teaser').classList.remove('on');
+      map.jumpTo({center:ctr,zoom,pitch,bearing,roll:rl,elevation:elev,padding:pad});
+      if(u<1)requestAnimationFrame(step);else fin()};
     requestAnimationFrame(step)})}
 function cine(x,tok,done,pf,slow){pf=pf||{pct:()=>1};
   map.setMaxZoom(17.6);
@@ -739,7 +781,7 @@ function openDay(d){
   if(first){st.opened.push(d);save();document.querySelector(`.door[data-d="${d}"]`).classList.add('open');cowbell()}
   $('card').classList.remove('show');document.body.classList.remove('cardopen');$('hunt').classList.remove('show');
   dropMemo();flying=true;cur=x;heat();addDay(x,true);const tok=++flyTok,pf=prefetch(x,true);
-  setTimeout(()=>{if(tok!==flyTok)return;if(first&&!reduce)orbit(x,tok,()=>cine(x,tok,()=>arrive(x),pf,true));else cine(x,tok,()=>arrive(x),pf)},first?650:150);
+  setTimeout(()=>{if(tok!==flyTok)return;if(first&&!reduce)flight(x,tok,()=>arrive(x));else cine(x,tok,()=>arrive(x),pf)},first?650:150);
   setTimeout(()=>{if(first)drawStrip()},1000);
 }
 /* chaud / froid */
