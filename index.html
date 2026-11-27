@@ -259,6 +259,11 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 .loadp{position:fixed;z-index:7;top:calc(max(12px,env(safe-area-inset-top)) + 4px);left:50%;transform:translateX(-50%);display:none;align-items:center;gap:10px;background:rgba(20,30,30,.86);color:#fff;font:700 14px/1 Nunito,sans-serif;padding:9px 16px 9px 10px;border-radius:22px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
 .loadp.show{display:flex}
 .loadp i{width:20px;height:20px;border-width:3px;border-color:rgba(255,255,255,.25);border-top-color:#f2c230}
+
+.teaser{position:fixed;z-index:6;left:50%;top:18%;transform:translate(-50%,10px);text-align:center;color:#fff;pointer-events:none;opacity:0;transition:opacity 1.2s ease,transform 1.2s ease;text-shadow:0 3px 18px rgba(0,0,0,.55),0 1px 3px rgba(0,0,0,.6)}
+.teaser.on{opacity:1;transform:translate(-50%,0)}
+.teaser small{display:block;font:800 18px/1 Nunito,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#f2c230;margin-bottom:10px}
+.teaser b{display:block;font:800 clamp(34px,5vw,58px)/1.05 "Baloo 2",sans-serif}
 </style>
 </head>
 <body>
@@ -269,7 +274,7 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 </header>
 <div class="prev" id="prev"><span id="prevt"></span><label><span id="snowl"></span> <input type="range" id="snowr" min="0" max="24"></label><button id="reset"></button></div>
 <div class="toast" id="toast"></div>
-<div class="vig" id="vig"></div><div class="xh" id="xh" aria-hidden="true"></div><div class="loadp" id="loadp" aria-live="polite"><i></i><span id="loadpt"></span></div>
+<div class="vig" id="vig"></div><div class="xh" id="xh" aria-hidden="true"></div><div class="teaser" id="teaser" aria-live="polite"><small id="tsd"></small><b id="tsq"></b></div><div class="loadp" id="loadp" aria-live="polite"><i></i><span id="loadpt"></span></div>
 <div class="heat" id="heat" aria-live="polite"><div class="cmp"><svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="#fff" stroke="#c9d1d6" stroke-width="2"/><path id="wedge" d="" fill="var(--hc)" opacity=".85"/><circle cx="27" cy="27" r="5" fill="#fff" stroke="var(--hc)" stroke-width="2.5"/><g id="cmpn"><path d="M27 3l3 6h-6z" fill="#1f2a1f"/></g></svg></div><div class="txt"><span id="heatp"></span><b id="heatl"></b><small id="heatd"></small></div></div>
 <section class="card" id="card" aria-live="polite">
   <button class="x" id="cx" aria-label="×">×</button>
@@ -404,7 +409,7 @@ let st={opened:[],found:[],intro:false,lang:'fr',solved:{},pz:{},snowPrev:null};
 try{const s=JSON.parse(localStorage.getItem('notre-suisse-v2')||'null');if(s)st=Object.assign(st,s)}catch(e){}
 const save=()=>{try{localStorage.setItem('notre-suisse-v2',JSON.stringify(st))}catch(e){}};
 const T={fr:{title:'Notre Suisse',msg:'Le message',pass:'Passeport',alb:'Album photo',pfound:'Photo trouvée',pmiss:'Photo à trouver',albnone:'Pas encore trouvée',back:'Retour',to2d:'Vue de dessus',to3d:'Vue en relief',
-  itag:'Calendrier de l\'Avent',ih:'Pour Angie',i1:'Chaque jour jusqu\'à Noël, une porte s\'ouvre sur un endroit de Suisse où je veux t\'emmener quand tu seras là.',i2:'Chaque jour, une photo de nous se cache aussi quelque part en Suisse. Des indices et un thermomètre chaud/froid t\'aident à la trouver. Chaque photo te donne une lettre et un tampon dans ton passeport.',hunt:'La photo du jour se cache quelque part en Suisse.',huntk:d=>`Chasse à la photo · Jour ${d}`,huntb:'Chasse à la photo',cmpb:'Activer la boussole',ago:'Y retourner',loadch:'Chargement de la Suisse',loadpl:'Chargement du lieu',fs:'Plein écran',fsx:'Quitter le plein écran',nofs:'Le plein écran n\'est pas disponible ici : ouvre la carte dans son propre onglet.',rose:'Glisse autour du cadran pour tourner, clique pour revenir au nord',rotl:'Tourner à gauche',rotr:'Tourner à droite',toHz:'Vue rasante',colday:n=>`Sa couleur se révélera le ${n} décembre.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Un autre indice (${i}/${n})`,tip:'Suis la boussole : elle montre la direction et la distance. Quand elle devient rouge, zoome tout près et cherche l\'appareil photo.',heat:['Glacial','Froid','Frais','Tiède','Chaud','Brûlant','Brûlant, zoome encore'],gauge:d=>`Photo du jour ${d}`,toward:['vers le nord','vers le nord-est',"vers l'est",'vers le sud-est','vers le sud','vers le sud-ouest',"vers l'ouest",'vers le nord-ouest'],dist:k=>k>100?'à plus de 100 km':k<1?'à moins d\'1 km':`à environ ${k} km`,go:'Ouvrir le calendrier',
+  itag:'Calendrier de l\'Avent',ih:'Pour Angie',i1:'Chaque jour jusqu\'à Noël, une porte s\'ouvre sur un endroit de Suisse où je veux t\'emmener quand tu seras là.',i2:'Chaque jour, une photo de nous se cache aussi quelque part en Suisse. Des indices et un thermomètre chaud/froid t\'aident à la trouver. Chaque photo te donne une lettre et un tampon dans ton passeport.',hunt:'La photo du jour se cache quelque part en Suisse.',huntk:d=>`Chasse à la photo · Jour ${d}`,huntb:'Chasse à la photo',cmpb:'Activer la boussole',tsd:d=>`${d} décembre`,tsq:'Où allons-nous ?',ago:'Y retourner',loadch:'Chargement de la Suisse',loadpl:'Chargement du lieu',fs:'Plein écran',fsx:'Quitter le plein écran',nofs:'Le plein écran n\'est pas disponible ici : ouvre la carte dans son propre onglet.',rose:'Glisse autour du cadran pour tourner, clique pour revenir au nord',rotl:'Tourner à gauche',rotr:'Tourner à droite',toHz:'Vue rasante',colday:n=>`Sa couleur se révélera le ${n} décembre.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Un autre indice (${i}/${n})`,tip:'Suis la boussole : elle montre la direction et la distance. Quand elle devient rouge, zoome tout près et cherche l\'appareil photo.',heat:['Glacial','Froid','Frais','Tiède','Chaud','Brûlant','Brûlant, zoome encore'],gauge:d=>`Photo du jour ${d}`,toward:['vers le nord','vers le nord-est',"vers l'est",'vers le sud-est','vers le sud','vers le sud-ouest',"vers l'ouest",'vers le nord-ouest'],dist:k=>k>100?'à plus de 100 km':k<1?'à moins d\'1 km':`à environ ${k} km`,go:'Ouvrir le calendrier',
   day:'Jour',again:'Revoir le lieu',overview:'Vue d\'ensemble',dirs:['au nord','au nord-est',"à l'est",'au sud-est','au sud','au sud-ouest',"à l'ouest",'au nord-ouest'],
   clue:(m,d)=>`<strong>Une photo de nous se cache par ici.</strong> Environ ${m} m ${d} du monument. Il faudra zoomer très près pour la voir.`,
   got:l=>`<strong>Photo trouvée.</strong> Ta lettre : ${l}`,ph:d=>`Ici, notre photo n°${d} et un petit mot`,letter:'Lettre trouvée',cont:'Continuer',
@@ -412,7 +417,7 @@ const T={fr:{title:'Notre Suisse',msg:'Le message',pass:'Passeport',alb:'Album p
   prev:'Aperçu',snow:'Neige : jour',reset:'Réinitialiser',pzt:'Le message',pzp:'Glisse les lettres dans les cases. Chaque couleur de case est un mot, et la couleur d\'une lettre se révèle 5 jours après sa découverte.',none:'Pas encore de lettre : trouve les photos cachées.',clear:'Tout retirer',close:'Fermer',wrong:'Pas encore, essaie un autre ordre',win:'Joyeux Noël, mon amour.',
   ppc:'PASSEPORT',pps:'NOTRE SUISSE',pph:'Visas',tomorrow:'À demain !',next:'Une autre porte t\'attend',xmas:'Joyeux Noël !',loading:'Chargement de la carte…'},
  en:{title:'Our Switzerland',msg:'The message',pass:'Passport',alb:'Photo album',pfound:'Photo found',pmiss:'Photo to find',albnone:'Not found yet',back:'Back',to2d:'Top view',to3d:'3D view',
-  itag:'Advent calendar',ih:'For Angie',i1:'Every day until Christmas, a door opens on a place in Switzerland where I want to take you once you\'re here.',i2:'Every day, a photo of us is also hidden somewhere in Switzerland. Hints and a hot/cold thermometer help you find it. Each photo gives you a letter and a stamp in your passport.',hunt:'Today\'s photo is hidden somewhere in Switzerland.',huntk:d=>`Photo hunt · Day ${d}`,huntb:'Photo hunt',cmpb:'Turn on the compass',ago:'Take me back there',loadch:'Loading Switzerland',loadpl:'Loading the place',fs:'Full screen',fsx:'Exit full screen',nofs:'Full screen isn\'t available here: open the map in its own tab.',rose:'Drag around the dial to turn, click to face north',rotl:'Turn left',rotr:'Turn right',toHz:'Horizon view',colday:n=>`Its colour will show on December ${n}.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Another hint (${i}/${n})`,tip:'Follow the compass: it shows the direction and the distance. When it turns red, zoom right in and look for the camera.',heat:['Freezing','Cold','Cool','Warm','Hot','Burning','Burning, zoom in more'],gauge:d=>`Day ${d} photo`,toward:['to the north','to the north-east','to the east','to the south-east','to the south','to the south-west','to the west','to the north-west'],dist:k=>k>100?'more than 100 km away':k<1?'less than 1 km away':`about ${k} km away`,go:'Open the calendar',
+  itag:'Advent calendar',ih:'For Angie',i1:'Every day until Christmas, a door opens on a place in Switzerland where I want to take you once you\'re here.',i2:'Every day, a photo of us is also hidden somewhere in Switzerland. Hints and a hot/cold thermometer help you find it. Each photo gives you a letter and a stamp in your passport.',hunt:'Today\'s photo is hidden somewhere in Switzerland.',huntk:d=>`Photo hunt · Day ${d}`,huntb:'Photo hunt',cmpb:'Turn on the compass',tsd:d=>`December ${d}`,tsq:'Where are we off to?',ago:'Take me back there',loadch:'Loading Switzerland',loadpl:'Loading the place',fs:'Full screen',fsx:'Exit full screen',nofs:'Full screen isn\'t available here: open the map in its own tab.',rose:'Drag around the dial to turn, click to face north',rotl:'Turn left',rotr:'Turn right',toHz:'Horizon view',colday:n=>`Its colour will show on December ${n}.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Another hint (${i}/${n})`,tip:'Follow the compass: it shows the direction and the distance. When it turns red, zoom right in and look for the camera.',heat:['Freezing','Cold','Cool','Warm','Hot','Burning','Burning, zoom in more'],gauge:d=>`Day ${d} photo`,toward:['to the north','to the north-east','to the east','to the south-east','to the south','to the south-west','to the west','to the north-west'],dist:k=>k>100?'more than 100 km away':k<1?'less than 1 km away':`about ${k} km away`,go:'Open the calendar',
   day:'Day',again:'Fly back',overview:'Whole map',dirs:['north','north-east','east','south-east','south','south-west','west','north-west'],
   clue:(m,d)=>`<strong>A photo of us is hidden around here.</strong> About ${m} m ${d} of the landmark. You'll need to zoom in very close to spot it.`,
   got:l=>`<strong>Photo found.</strong> Your letter: ${l}`,ph:d=>`Our photo no. ${d} and a little note go here`,letter:'Letter found',cont:'Continue',
@@ -615,7 +620,7 @@ function pump(){while(pAct<14&&PQ.length){const it=PQ.shift();pAct++;tget(it.k).
 function grab(keys,prio){let n=0;const tot=keys.length||1;const cb=()=>{n++};const items=keys.map(k=>({k,cb}));if(prio)PQ.unshift(...items);else PQ.push(...items);pump();return{pct:()=>n/tot}}
 prefetch=(x,prio)=>{const K=[],add=(kd,z,R)=>{const[cx,cy]=tXY(x.lon,x.lat,z);for(let dy=-R;dy<=R;dy++)for(let dx=-R;dx<=R;dx++)K.push(`${kd}/${z}/${cx+dx}/${cy+dy}`)};
   /* dans l'ordre de la plongée : des vues larges vers le détail */
-  [[10,2],[11,2],[12,2],[13,3],[14,3]].forEach(([z,R],i)=>{add('b',z,R);add('r',z,R);if(z<14)add('t',Math.min(13,z+1),z<11?2:3)});
+  [[10,2],[11,2],[12,3],[13,4],[14,4]].forEach(([z,R])=>{add('b',z,R);add('r',z,R);if(z<14)add('t',z+1,z<11?2:z<12?3:4)});
   return grab(K,prio)};
 preloadCH=onp=>new Promise(res=>{const K=[],B=[5.9,45.8,10.55,47.85],box=(kd,z)=>{const[x0,y0]=tXY(B[0],B[3],z),[x1,y1]=tXY(B[2],B[1],z);for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++)K.push(`${kd}/${z}/${x}/${y}`)};
   for(let z=5;z<=9;z++){box('b',z);box('r',z)}for(let z=6;z<=9;z++)box('t',z);
@@ -658,8 +663,9 @@ function dive(x,tok,dur,done){
   let eT=groundAt(x.lon,x.lat)||s0.e,stop=false;const halt=()=>{stop=true};
   map.on('dragstart',halt);map.on('wheel',halt);map.on('touchstart',halt);map.setCenterClampedToGround(false);
   const end=()=>{map.off('dragstart',halt);map.off('wheel',halt);map.off('touchstart',halt);done()};
-  const t0=performance.now(),step=now=>{if(tok!==flyTok){end();return}
-    const k=Math.min(1,(now-t0)/dur),e=ease(k),g=groundAt(x.lon,x.lat);if(g)eT=g;
+  const t0=performance.now();let prog=0,last=t0;const step=now=>{if(tok!==flyTok){end();return}
+    const dt=Math.min(50,now-last);last=now;prog=Math.min(1,prog+dt/dur*(map.areTilesLoaded()||now-t0>dur*2.2?1:.28));
+    const k=prog,e=ease(k),g=groundAt(x.lon,x.lat);if(g)eT=g;
     if(!stop)map.jumpTo({center:new maplibregl.MercatorCoordinate(A.x+(B.x-A.x)*e,A.y+(B.y-A.y)*e).toLngLat(),zoom:s0.z+(c.zoom-s0.z)*e,pitch:s0.p+(c.pitch-s0.p)*e,bearing:s0.b+db*e,elevation:s0.e+(eT-s0.e)*e,padding:c.padding});
     if(k<1&&!stop)requestAnimationFrame(step);else end()};
   requestAnimationFrame(step)}
@@ -671,12 +677,25 @@ function fly(x){map.setMaxZoom(17.6);const tok=++flyTok,near=map.getCenter().dis
 function waitPF(pf,tok,cb){const t0=performance.now();const tick=()=>{if(tok!==flyTok){$('loadp').classList.remove('show');return}
     const p=pf.pct(),dt=performance.now()-t0;if(p>=.97||dt>9000){$('loadp').classList.remove('show');cb();return}
     if(dt>250){$('loadpt').textContent=`${t().loadpl}… ${Math.round(p*100)} %`;$('loadp').classList.add('show')}setTimeout(tick,120)};tick()}
-function cine(x,tok,done,pf){pf=pf||{pct:()=>1};
+function orbit(x,tok,next){
+  const Z=HOME.zoom+.15,bT=camOf(x).bearing,n=((bT%360)+540)%360-180;let R=360+n;if(R<240)R+=360;
+  const dur=Math.max(6500,Math.min(11000,8500*R/360)),ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+  $('tsd').textContent=t().tsd(x.d);$('tsq').textContent=t().tsq;setTimeout(()=>{if(tok===flyTok)$('teaser').classList.add('on')},500);
+  map.easeTo({center:[8.23,46.80],zoom:Z,pitch:50,bearing:0,padding:{top:0,bottom:0,left:0,right:0},duration:1800,essential:true});
+  map.once('moveend',()=>{if(tok!==flyTok){$('teaser').classList.remove('on');return}
+    let stop=false;const halt=()=>{stop=true};map.on('dragstart',halt);map.on('wheel',halt);map.on('touchstart',halt);
+    const t0=performance.now(),step=now=>{if(tok!==flyTok){fin(false);return}const k=Math.min(1,(now-t0)/dur),e=ease(k);
+      if(!stop)map.jumpTo({bearing:R*e,zoom:Z+.35*Math.sin(Math.PI*e),pitch:50+8*e});
+      if(k>.72)$('teaser').classList.remove('on');
+      if(k<1&&!stop)requestAnimationFrame(step);else fin(true)};
+    const fin=go=>{map.off('dragstart',halt);map.off('wheel',halt);map.off('touchstart',halt);$('teaser').classList.remove('on');if(go)next()};
+    requestAnimationFrame(step)})}
+function cine(x,tok,done,pf,slow){pf=pf||{pct:()=>1};
   map.setMaxZoom(17.6);
   if(reduce){lock(x,done);return}
-  map.flyTo({center:[x.lon,x.lat],zoom:10.3,pitch:45,bearing:0,padding:padOf(),duration:3400,curve:1.42,essential:true});
+  map.flyTo({center:[x.lon,x.lat],zoom:10.3,pitch:48,bearing:camOf(x).bearing,padding:padOf(),duration:slow?4800:3400,curve:1.42,essential:true});
   map.once('moveend',()=>{if(tok!==flyTok)return;waitPF(pf,tok,()=>{let go=false;const d=()=>{if(go||tok!==flyTok)return;go=true;map.setMaxZoom(17.6);
-    dive(x,tok,5200,()=>{if(tok===flyTok)lock(x,done)})};map.once('idle',d);setTimeout(d,1200)})});
+    dive(x,tok,slow?6500:5200,()=>{if(tok===flyTok)lock(x,done)})};map.once('idle',d);setTimeout(d,1200)})});
 }
 function chime(){const a=ac();if(!a)return;const t0=a.currentTime;[1046.5,1318.5,1568,2093].forEach((f,i)=>{const o=a.createOscillator();o.type='sine';o.frequency.value=f;env(a,o,t0+i*.09,.12,1.2);o.start(t0+i*.09);o.stop(t0+i*.09+1.3)})}
 function arrive(x){flying=false;const m=mons[x.d];if(m){const el=m.getElement();el.classList.remove('hid');void el.offsetWidth;el.classList.add('arrive');setTimeout(()=>el.classList.remove('arrive'),4200)}
@@ -708,7 +727,7 @@ function openDay(d){
   if(first){st.opened.push(d);save();document.querySelector(`.door[data-d="${d}"]`).classList.add('open');cowbell()}
   $('card').classList.remove('show');document.body.classList.remove('cardopen');$('hunt').classList.remove('show');
   dropMemo();flying=true;cur=x;heat();addDay(x,true);const tok=++flyTok,pf=prefetch(x,true);
-  setTimeout(()=>{if(tok===flyTok)cine(x,tok,()=>arrive(x),pf)},first?650:150);
+  setTimeout(()=>{if(tok!==flyTok)return;if(first&&!reduce)orbit(x,tok,()=>cine(x,tok,()=>arrive(x),pf,true));else cine(x,tok,()=>arrive(x),pf)},first?650:150);
   setTimeout(()=>{if(first)drawStrip()},1000);
 }
 /* chaud / froid */
