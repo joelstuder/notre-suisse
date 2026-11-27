@@ -618,10 +618,15 @@ const tXY=(lon,lat,z)=>{const n=2**z;return[Math.floor((lon+180)/360*n),Math.flo
 const PQ=[];let pAct=0;
 function pump(){while(pAct<14&&PQ.length){const it=PQ.shift();pAct++;tget(it.k).catch(()=>{}).finally(()=>{pAct--;it.cb();pump()})}}
 function grab(keys,prio){let n=0;const tot=keys.length||1;const cb=()=>{n++};const items=keys.map(k=>({k,cb}));if(prio)PQ.unshift(...items);else PQ.push(...items);pump();return{pct:()=>n/tot}}
-prefetch=(x,prio)=>{const K=[],add=(kd,z,R)=>{const[cx,cy]=tXY(x.lon,x.lat,z);for(let dy=-R;dy<=R;dy++)for(let dx=-R;dx<=R;dx++)K.push(`${kd}/${z}/${cx+dx}/${cy+dy}`)};
-  /* dans l'ordre de la plongée : des vues larges vers le détail */
-  [[10,2],[11,2],[12,3],[13,4],[14,4]].forEach(([z,R])=>{add('b',z,R);add('r',z,R);if(z<14)add('t',z+1,z<11?2:z<12?3:4)});
+/* seulement ce que la caméra verra pendant la plongée : le lieu, ses voisins, et quelques tuiles devant (dans la direction du regard) */
+prefetch=(x,prio)=>{const K=[],seen=new Set(),b=(x.bearing??camOf(x).bearing)*Math.PI/180,fx=Math.sin(b),fy=-Math.cos(b);
+  const add=(kd,z,R,F)=>{const[cx,cy]=tXY(x.lon,x.lat,z);const put=(X,Y)=>{const k=`${kd}/${z}/${X}/${Y}`;if(!seen.has(k)){seen.add(k);K.push(k)}};
+    for(let dy=-R;dy<=R;dy++)for(let dx=-R;dx<=R;dx++)put(cx+dx,cy+dy);
+    for(let f=1;f<=F;f++)for(let s=-1;s<=1;s++)put(Math.round(cx+fx*(R+f)-fy*s),Math.round(cy+fy*(R+f)+fx*s))};
+  [[10,1,0],[11,1,1],[12,2,1],[13,1,2],[14,1,2]].forEach(([z,R,F])=>{add('b',z,R,F);add('r',z,R,F)});
+  [[11,1,0],[12,2,1],[13,1,2]].forEach(([z,R,F])=>add('t',z,R,F));
   return grab(K,prio)};
+/* à l'ouverture : toute la Suisse en vue d'ensemble */
 preloadCH=onp=>new Promise(res=>{const K=[],B=[5.9,45.8,10.55,47.85],box=(kd,z)=>{const[x0,y0]=tXY(B[0],B[3],z),[x1,y1]=tXY(B[2],B[1],z);for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++)K.push(`${kd}/${z}/${x}/${y}`)};
   for(let z=5;z<=9;z++){box('b',z);box('r',z)}for(let z=6;z<=9;z++)box('t',z);
   const g=grab(K,false),tick=()=>{const v=g.pct();onp(v);if(v>=.995){res();return}setTimeout(tick,150)};tick()});
@@ -656,30 +661,37 @@ function lock(x,cb){map.setMaxZoom(17.6);map.setCenterClampedToGround(false);
     if((since&&now-since>600&&map.areTilesLoaded())||now-t0>4000){clearInterval(poll);finish(g)}},150)}
 /* la plongée : animée image par image, avec l'altitude du sol fournie explicitement
    (la carte ne la devine plus au départ, c'est ce qui la faisait se tromper de cadrage à l'arrivée) */
+/* la plongée, en deux temps : on glisse jusqu'au niveau où les bâtiments sont complets (zoom 14, le plus détaillé
+   des données swisstopo), on plane le temps que tout soit dessiné, puis on descend sur le lieu : à partir de là,
+   plus aucune nouvelle tuile n'est nécessaire, la fin est parfaitement nette */
 function dive(x,tok,dur,done){
-  const c=safeCam(x),s0={c:map.getCenter(),z:map.getZoom(),p:map.getPitch(),b:map.getBearing(),e:map.transform.elevation},
-    A=maplibregl.MercatorCoordinate.fromLngLat(s0.c),B=maplibregl.MercatorCoordinate.fromLngLat(c.center),db=((c.bearing-s0.b)%360+540)%360-180,
-    ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
-  let eT=groundAt(x.lon,x.lat)||s0.e,stop=false;const halt=()=>{stop=true};
+  const c=safeCam(x),merc=ll=>maplibregl.MercatorCoordinate.fromLngLat(ll),nb=d=>((d%360)+540)%360-180,
+    inOut=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,out=k=>1-Math.pow(1-k,3);
+  let eT=groundAt(x.lon,x.lat)||map.transform.elevation,stop=false;const halt=()=>{stop=true};
   map.on('dragstart',halt);map.on('wheel',halt);map.on('touchstart',halt);map.setCenterClampedToGround(false);
-  const end=()=>{map.off('dragstart',halt);map.off('wheel',halt);map.off('touchstart',halt);done()};
-  const t0=performance.now();let prog=0,last=t0;const step=now=>{if(tok!==flyTok){end();return}
-    const dt=Math.min(50,now-last);last=now;prog=Math.min(1,prog+dt/dur*(map.areTilesLoaded()||now-t0>dur*2.2?1:.28));
-    const k=prog,e=ease(k),g=groundAt(x.lon,x.lat);if(g)eT=g;
-    if(!stop)map.jumpTo({center:new maplibregl.MercatorCoordinate(A.x+(B.x-A.x)*e,A.y+(B.y-A.y)*e).toLngLat(),zoom:s0.z+(c.zoom-s0.z)*e,pitch:s0.p+(c.pitch-s0.p)*e,bearing:s0.b+db*e,elevation:s0.e+(eT-s0.e)*e,padding:c.padding});
-    if(k<1&&!stop)requestAnimationFrame(step);else end()};
-  requestAnimationFrame(step)}
+  const end=()=>{map.off('dragstart',halt);map.off('wheel',halt);map.off('touchstart',halt);done()},live=()=>tok===flyTok&&!stop;
+  const seg=(to,d,ease,cb)=>{const s0={c:map.getCenter(),z:map.getZoom(),p:map.getPitch(),b:map.getBearing(),e:map.transform.elevation},
+      A=merc(s0.c),B=merc(to.center),db=nb(to.bearing-s0.b),t0=performance.now();
+    const step=now=>{if(!live()){cb();return}const k=Math.min(1,(now-t0)/d),e=ease(k),g=groundAt(x.lon,x.lat);if(g)eT=g;
+      map.jumpTo({center:new maplibregl.MercatorCoordinate(A.x+(B.x-A.x)*e,A.y+(B.y-A.y)*e).toLngLat(),zoom:s0.z+(to.zoom-s0.z)*e,pitch:s0.p+(to.pitch-s0.p)*e,bearing:s0.b+db*e,elevation:s0.e+(eT-s0.e)*e,padding:c.padding});
+      if(k<1)requestAnimationFrame(step);else cb()};requestAnimationFrame(step)};
+  const hold=cb=>{const t0=performance.now();let last=t0;const step=now=>{if(!live()){cb();return}const el=now-t0,dt=now-last;last=now;
+      if((el>350&&map.areTilesLoaded())||el>2600){cb();return}
+      map.jumpTo({zoom:map.getZoom()+dt*.00007,bearing:map.getBearing()+dt*.0025});requestAnimationFrame(step)};requestAnimationFrame(step)};
+  if(c.zoom>14.8){const mid={center:c.center,zoom:14.3,pitch:Math.max(45,c.pitch-6),bearing:c.bearing-10};
+    seg(mid,dur*.58,inOut,()=>live()?hold(()=>live()?seg(c,dur*.48,out,end):end()):end())}
+  else seg(c,dur,inOut,end)}
 function fly(x){map.setMaxZoom(17.6);const tok=++flyTok,near=map.getCenter().distanceTo(new maplibregl.LngLat(x.lon,x.lat))<4000;
   if(reduce){lock(x);return}
   if(near)dive(x,tok,2400,()=>{if(tok===flyTok)lock(x)});
   else{map.flyTo({...safeCam(x),duration:3000,curve:1.5});map.once('moveend',()=>{if(tok===flyTok)lock(x)})}}
 /* le grand voyage : on survole d'abord la région, puis on plonge lentement jusqu'au lieu */
 function waitPF(pf,tok,cb){const t0=performance.now();const tick=()=>{if(tok!==flyTok){$('loadp').classList.remove('show');return}
-    const p=pf.pct(),dt=performance.now()-t0;if(p>=.97||dt>9000){$('loadp').classList.remove('show');cb();return}
+    const p=pf.pct(),dt=performance.now()-t0;if(p>=.97||dt>3500){$('loadp').classList.remove('show');cb();return}
     if(dt>250){$('loadpt').textContent=`${t().loadpl}… ${Math.round(p*100)} %`;$('loadp').classList.add('show')}setTimeout(tick,120)};tick()}
 function orbit(x,tok,next){
   const Z=HOME.zoom+.15,bT=camOf(x).bearing,n=((bT%360)+540)%360-180;let R=360+n;if(R<240)R+=360;
-  const dur=Math.max(6500,Math.min(11000,8500*R/360)),ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+  const dur=Math.max(6000,Math.min(9500,7600*R/360)),ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
   $('tsd').textContent=t().tsd(x.d);$('tsq').textContent=t().tsq;setTimeout(()=>{if(tok===flyTok)$('teaser').classList.add('on')},500);
   map.easeTo({center:[8.23,46.80],zoom:Z,pitch:50,bearing:0,padding:{top:0,bottom:0,left:0,right:0},duration:1800,essential:true});
   map.once('moveend',()=>{if(tok!==flyTok){$('teaser').classList.remove('on');return}
@@ -693,7 +705,7 @@ function orbit(x,tok,next){
 function cine(x,tok,done,pf,slow){pf=pf||{pct:()=>1};
   map.setMaxZoom(17.6);
   if(reduce){lock(x,done);return}
-  map.flyTo({center:[x.lon,x.lat],zoom:10.3,pitch:48,bearing:camOf(x).bearing,padding:padOf(),duration:slow?4800:3400,curve:1.42,essential:true});
+  map.flyTo({center:[x.lon,x.lat],zoom:10.3,pitch:48,bearing:camOf(x).bearing,padding:padOf(),duration:slow?4200:3400,curve:1.42,essential:true});
   map.once('moveend',()=>{if(tok!==flyTok)return;waitPF(pf,tok,()=>{let go=false;const d=()=>{if(go||tok!==flyTok)return;go=true;map.setMaxZoom(17.6);
     dive(x,tok,slow?6500:5200,()=>{if(tok===flyTok)lock(x,done)})};map.once('idle',d);setTimeout(d,1200)})});
 }
