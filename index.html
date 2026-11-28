@@ -48,7 +48,7 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 .door.locked .leaf{background:linear-gradient(#b9bfc0,#a3aaab);color:#eef0f0;box-shadow:inset 0 0 0 3px rgba(255,255,255,.25)}
 .door.locked .leaf .num{opacity:.75}
 .door.locked .leaf::after{display:none}
-.door .leaf .lk{position:absolute;right:7px;top:47%;width:11px;height:13px;opacity:.85}
+.door .leaf .lk{position:absolute;right:7px;top:7px;width:11px;height:13px;opacity:.85}
 .door.today{z-index:1;animation:dlift 2.4s ease-in-out infinite}
 .door.today .leaf{overflow:hidden;background:linear-gradient(160deg,#ff5a49,var(--red) 55%,#b3121f);animation:glow 2.4s ease-in-out infinite}
 .door.today .leaf::before{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:45%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:sheen 2.4s ease-in-out infinite}
@@ -269,7 +269,7 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 .acell.slot{background:#fff8e6;box-shadow:0 0 0 2px #f2c230,0 0 14px rgba(242,194,48,.6);animation:slotp 1.2s ease-in-out infinite}
 .acell.slot .im{background:none;border:2px dashed #e0c47a}
 @keyframes slotp{50%{box-shadow:0 0 0 3px #f2c230,0 0 22px rgba(242,194,48,.9)}}
-.acell.fly{position:fixed;z-index:12;margin:0;pointer-events:none;transform-origin:50% 50%;box-shadow:0 18px 40px rgba(0,0,0,.4)}
+.acell.fly{position:fixed;z-index:12;margin:0;pointer-events:none;transform-origin:50% 50%;box-shadow:0 18px 40px rgba(0,0,0,.4)}.acell.fly span:last-child{opacity:0}
 .acell.stuck::before,.acell.stuck::after{content:"";position:absolute;z-index:2;width:34%;height:12%;background:rgba(255,245,200,.78);box-shadow:0 1px 2px rgba(0,0,0,.15);animation:tape .35s ease-out both}
 .acell.stuck::before{top:-5%;left:-8%;transform:rotate(-38deg)}
 .acell.stuck::after{bottom:-3%;right:-8%;transform:rotate(-38deg);animation-delay:.12s}
@@ -616,7 +616,7 @@ function openPassport(fresh){
   }else{drawPassport(fresh||null);book.classList.add('open');$('pp').classList.add('show');if(fresh){thump();$('ppmsg').textContent=t()[endKey(fresh)]}}
 }
 /* message de fin : chasse à la photo si elle reste à trouver, sinon « à demain » / « une autre porte » / « joyeux Noël » */
-const nextKey=d=>d===24?'xmas':(unlocked(d+1)&&!st.opened.includes(d+1)?'next':'tomorrow');
+const nextKey=d=>st.opened.length>=24||d===24&&!DAYS.some(y=>!st.opened.includes(y.d))?'xmas':(DAYS.some(y=>unlocked(y.d)&&!st.opened.includes(y.d))?'next':'tomorrow');
 const endKey=d=>st.found.includes(d)?nextKey(d):'huntnow';
 function coverMsg(d){const k=endKey(d);$('cvmsg').innerHTML=`<span>${esc(T.fr[k])}</span><span>${esc(T.en[k])}</span>`;$('cvmsg').classList.add('on')}
 function drawAlbum(slot){$('al').querySelector('.album').classList.remove('viewing');$('aview').hidden=true;$('agrid').hidden=false;$('almsg').textContent='';
