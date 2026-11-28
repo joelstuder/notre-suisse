@@ -44,10 +44,18 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 .door .leaf small{position:absolute;bottom:8px;font-size:11px;font-weight:700;opacity:.9}
 .door .leaf::after{content:"";position:absolute;right:9px;top:52%;width:6px;height:6px;border-radius:50%;background:var(--gold)}
 .door.open .leaf{transform:rotateY(-108deg)}
-.door.locked .leaf{background:#8e9a9c;box-shadow:inset 0 0 0 4px rgba(255,255,255,.15)}
-.door.locked{cursor:not-allowed}
-.door.today .leaf{animation:glow 2.2s ease-in-out infinite}
-@keyframes glow{50%{box-shadow:inset 0 0 0 4px #fff,0 0 0 5px rgba(242,194,48,.8)}}
+.door.locked{cursor:not-allowed;background:#e4e2dc;box-shadow:0 3px 0 rgba(0,0,0,.1),0 4px 8px rgba(0,0,0,.1);opacity:.62}
+.door.locked .leaf{background:linear-gradient(#b9bfc0,#a3aaab);color:#eef0f0;box-shadow:inset 0 0 0 3px rgba(255,255,255,.25)}
+.door.locked .leaf .num{opacity:.75}
+.door.locked .leaf::after{display:none}
+.door .leaf .lk{position:absolute;right:7px;top:47%;width:11px;height:13px;opacity:.85}
+.door.today{z-index:1;animation:dlift 2.4s ease-in-out infinite}
+.door.today .leaf{overflow:hidden;background:linear-gradient(160deg,#ff5a49,var(--red) 55%,#b3121f);animation:glow 2.4s ease-in-out infinite}
+.door.today .leaf::before{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:45%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:sheen 2.4s ease-in-out infinite}
+.door.today .leaf small{color:#ffe9a0;font-weight:800;opacity:1}
+@keyframes glow{0%,100%{box-shadow:inset 0 0 0 3px #f2c230,0 0 6px 1px rgba(242,194,48,.55)}50%{box-shadow:inset 0 0 0 4px #fff3b0,0 0 18px 6px rgba(242,194,48,.9)}}
+@keyframes sheen{0%,35%{left:-60%}75%,100%{left:120%}}
+@keyframes dlift{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 .card{position:fixed;z-index:6;left:12px;right:12px;bottom:132px;max-height:calc(100dvh - 300px);overflow:auto;background:var(--panel);border-radius:20px;padding:0;box-shadow:0 14px 44px rgba(0,0,0,.28);display:none;scrollbar-width:thin;overscroll-behavior:contain}
 .card.show{display:block;animation:cin .45s cubic-bezier(.2,.8,.2,1)}
 @keyframes cin{from{opacity:0;transform:translateY(14px)}}
@@ -220,7 +228,7 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 @media(min-width:900px){.card{left:auto;right:88px;top:16px;bottom:132px;width:min(540px,calc(100vw - 480px));max-height:none}.hunt{right:auto;bottom:auto;top:calc(max(12px,env(safe-area-inset-top)) + 60px);width:330px}}
 @media(max-width:899px){body.cardopen .hunt{display:none}.huntbtn{display:inline-flex}.card h2{font-size:28px}.facts{grid-template-columns:1fr 1fr 1fr}.gal .nv{opacity:1}}
 @media(max-width:600px){.card{max-height:calc(100dvh - 330px)}.heat{left:12px;transform:none;top:calc(max(12px,env(safe-area-inset-top)) + 58px)}.chip span{display:none}.chip{padding:0 10px}.hud{flex-wrap:nowrap}.flag.minor{display:none}.prev{top:auto;bottom:124px;right:auto;left:12px}.tag{font-size:21px}.chip{font-size:14px;min-height:40px}.card{bottom:128px}.card h2{font-size:24px}.slot{width:24px;height:30px;font-size:16px;line-height:26px}.slots{gap:6px 10px}.tile{width:28px;height:32px;font-size:17px;line-height:32px}.book.open{transform:translateX(14%)}}
-@media(prefers-reduced-motion:reduce){.door .leaf,.cover,.book{transition:none}.door.today .leaf,.mon,.cam i{animation:none}.shake,.stamp.slam{animation:none}}
+@media(prefers-reduced-motion:reduce){.door .leaf,.cover,.book{transition:none}.door.today,.door.today .leaf,.door.today .leaf::before,.mon,.cam i{animation:none}.shake,.stamp.slam{animation:none}}
 
 /* ---- photo trouvée : grand format ---- */
 .polaroid.big{width:min(940px,94vw);transform:rotate(-1deg);padding:16px 16px 18px}
@@ -249,6 +257,28 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
 .book.open .cover{transform:rotateY(-180deg)}
 @media(max-width:700px){.book{height:auto;aspect-ratio:3/4;width:min(340px,86vw);transform:none}.book .page{grid-template-columns:repeat(4,1fr);grid-template-rows:auto;overflow:auto;clip-path:none;container-type:normal}.book .stamp{width:100%;font-size:8px}.book .page::after{display:none}.book .cover{left:0}}
 @media(prefers-reduced-motion:reduce){.book,.book .page{transition:none}}
+/* ---- album : ouverture + photo qui vient se coller ---- */
+#al{perspective:1800px}
+.puzzle.album{position:relative;transform-style:preserve-3d}
+.acover{position:absolute;inset:0;z-index:4;border-radius:20px;background:#2f5d4e;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 3px,transparent 3px 7px);box-shadow:inset 0 0 0 3px rgba(242,194,48,.45),0 20px 60px rgba(0,0,0,.4);display:grid;place-items:center;align-content:center;gap:10px;color:#f2c230;text-align:center;transform-origin:left center;backface-visibility:hidden;pointer-events:none;transition:transform 1.1s cubic-bezier(.4,.2,.2,1),opacity .3s 1s}
+.acover b{font:800 30px/1 "Baloo 2",sans-serif;letter-spacing:.06em}
+.acover small{font-weight:700;font-size:13px;letter-spacing:.12em;opacity:.9}
+.acover i{width:78px;height:66px;background:#fff;padding:6px 6px 16px;box-shadow:0 6px 14px rgba(0,0,0,.35);transform:rotate(-6deg)}
+.acover i::before{content:"";display:block;width:100%;height:100%;background:linear-gradient(160deg,#ffe8b8,#f6b26b 45%,#d52b1e)}
+.acover.open{transform:rotateY(-178deg);opacity:0}
+.acell.slot{background:#fff8e6;box-shadow:0 0 0 2px #f2c230,0 0 14px rgba(242,194,48,.6);animation:slotp 1.2s ease-in-out infinite}
+.acell.slot .im{background:none;border:2px dashed #e0c47a}
+@keyframes slotp{50%{box-shadow:0 0 0 3px #f2c230,0 0 22px rgba(242,194,48,.9)}}
+.acell.fly{position:fixed;z-index:12;margin:0;pointer-events:none;transform-origin:50% 50%;box-shadow:0 18px 40px rgba(0,0,0,.4)}
+.acell.stuck::before,.acell.stuck::after{content:"";position:absolute;z-index:2;width:34%;height:12%;background:rgba(255,245,200,.78);box-shadow:0 1px 2px rgba(0,0,0,.15);animation:tape .35s ease-out both}
+.acell.stuck::before{top:-5%;left:-8%;transform:rotate(-38deg)}
+.acell.stuck::after{bottom:-3%;right:-8%;transform:rotate(-38deg);animation-delay:.12s}
+@keyframes tape{from{opacity:0;scale:1.6}}
+.acell.stuck{animation:press .5s cubic-bezier(.3,1.5,.5,1)}
+@keyframes press{0%{scale:1.12}100%{scale:1}}
+.almsg{margin:10px 0 0!important;text-align:center;font:800 24px/1.1 "Baloo 2",sans-serif!important;color:var(--red)!important;min-height:0}
+.almsg:empty{display:none}
+@media(prefers-reduced-motion:reduce){.acover{transition:none}.acell.slot,.acell.stuck,.acell.stuck::before,.acell.stuck::after{animation:none}}
 /* ---- chargement ---- */
 .vl{display:grid;justify-items:center;gap:12px;font:800 22px/1 "Baloo 2",sans-serif}
 .vl i,.loadp i{width:30px;height:30px;border-radius:50%;border:4px solid rgba(61,85,96,.25);border-top-color:#d52b1e;animation:spin .8s linear infinite}
@@ -275,7 +305,7 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
   <span class="lang" role="group" aria-label="Langue"><button id="lfr" aria-pressed="true">FR</button><button id="len" aria-pressed="false">EN</button></span>
   <button class="ib" id="bmsg"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="7" width="26" height="18" rx="3" fill="#fff7dc" stroke="#d52b1e" stroke-width="2"/><path d="M4 9l12 9 12-9" fill="none" stroke="#d52b1e" stroke-width="2"/><path d="M16 24c-3-2-5-4-5-6a2.5 2.5 0 0 1 5-1 2.5 2.5 0 0 1 5 1c0 2-2 4-5 6z" fill="#d52b1e"/></svg></button><button class="ib" id="bpass"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="6" y="3" width="20" height="26" rx="3" fill="#b3121f"/><rect x="13.5" y="9" width="5" height="14" fill="#fff"/><rect x="9" y="13.5" width="14" height="5" fill="#fff"/></svg></button><button class="ib" id="balb"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="8" width="20" height="18" rx="2" fill="#fff" stroke="#8a9aa3" stroke-width="1.5" transform="rotate(-8 14 17)"/><rect x="9" y="6" width="20" height="18" rx="2" fill="#fff" stroke="#8a9aa3" stroke-width="1.5"/><rect x="11.5" y="8.5" width="15" height="10" fill="#9fd16b"/><path d="M11.5 18.5l5-6 4 4 2-2 4 4z" fill="#5cae46"/><circle cx="23" cy="11.5" r="1.6" fill="#f2c230"/></svg></button><button class="ib" id="bfs"><svg viewBox="0 0 32 32" aria-hidden="true"><path id="fsp" d="M5 12V5h7M27 12V5h-7M5 20v7h7M27 20v7h-7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 </header>
-<div class="prev" id="prev"><span id="prevt"></span><label><span id="snowl"></span> <input type="range" id="snowr" min="0" max="24"></label><button id="reset"></button></div>
+<div class="prev" id="prev"><span id="prevt"></span><label><span id="snowl"></span> <b id="snowv"></b> <input type="range" id="snowr" min="0" max="24"></label><button id="reset"></button></div>
 <div class="toast" id="toast"></div>
 <div class="vig" id="vig"></div><div class="xh" id="xh" aria-hidden="true"></div><div class="clouds" id="clouds" aria-hidden="true"><i style="left:-20%;top:-25%;width:70vmax;height:55vmax"></i><i style="left:35%;top:-30%;width:75vmax;height:60vmax"></i><i style="left:-25%;top:30%;width:65vmax;height:60vmax"></i><i style="left:55%;top:20%;width:70vmax;height:60vmax"></i><i style="left:10%;top:55%;width:80vmax;height:55vmax"></i><i style="left:-10%;top:5%;width:55vmax;height:45vmax"></i><i style="left:45%;top:-5%;width:55vmax;height:50vmax"></i><i style="left:25%;top:25%;width:60vmax;height:50vmax"></i><i style="left:60%;top:60%;width:60vmax;height:50vmax"></i></div><div class="teaser" id="teaser" aria-live="polite"><small id="tsd"></small><b id="tsq"></b></div><div class="loadp" id="loadp" aria-live="polite"><i></i><span id="loadpt"></span></div>
 <div class="heat" id="heat" aria-live="polite"><div class="cmp"><svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="#fff" stroke="#c9d1d6" stroke-width="2"/><path id="wedge" d="" fill="var(--hc)" opacity=".85"/><circle cx="27" cy="27" r="5" fill="#fff" stroke="var(--hc)" stroke-width="2.5"/><g id="cmpn"><path d="M27 3l3 6h-6z" fill="#1f2a1f"/></g></svg></div><div class="txt"><span id="heatp"></span><b id="heatl"></b><small id="heatd"></small></div></div>
@@ -315,8 +345,10 @@ button:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
   <button class="btn" id="ppclose"></button>
 </div></div>
 <div class="modal" id="al"><div class="puzzle album" role="dialog" aria-modal="true">
+  <div class="acover" id="acover" hidden><i></i><b id="acb"></b><small id="acs"></small></div>
   <h2 id="alt"></h2>
   <div class="agrid" id="agrid"></div>
+  <p class="almsg" id="almsg"></p>
   <div class="aview" id="aview" hidden><div class="aimg" id="aimg"></div><p id="acap"></p><div class="row"><button class="btn" id="ago"></button><button class="btn ghost" id="aback"></button></div></div>
   <div class="row"><button class="btn" id="alclose"></button></div>
 </div></div>
@@ -408,24 +440,26 @@ const DAYS=DATA.days,ZONES=DATA.zones;
 const PREVIEW=location.hash==='#apercu';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let st={opened:[],found:[],intro:false,lang:'fr',solved:{},pz:{},snowPrev:null};
+let st={opened:[],found:[],stamped:null,intro:false,lang:'fr',solved:{},pz:{},snowPrev:null};
 try{const s=JSON.parse(localStorage.getItem('notre-suisse-v2')||'null');if(s)st=Object.assign(st,s)}catch(e){}
+if(!Array.isArray(st.stamped))st.stamped=[...st.found];   // tampon du passeport : posé dès que la fiche du lieu est fermée (avant la photo)
+const stamped=d=>st.stamped.includes(d);
 const save=()=>{try{localStorage.setItem('notre-suisse-v2',JSON.stringify(st))}catch(e){}};
 const T={fr:{title:'Notre Suisse',msg:'Le message',pass:'Passeport',alb:'Album photo',pfound:'Photo trouvée',pmiss:'Photo à trouver',albnone:'Pas encore trouvée',back:'Retour',to2d:'Vue de dessus',to3d:'Vue en relief',
-  itag:'Calendrier de l\'Avent',ih:'Pour Angie',i1:'Chaque jour jusqu\'à Noël, une porte s\'ouvre sur un endroit de Suisse où je veux t\'emmener quand tu seras là.',i2:'Chaque jour, une photo de nous se cache aussi quelque part en Suisse. Des indices et un thermomètre chaud/froid t\'aident à la trouver. Chaque photo te donne une lettre et un tampon dans ton passeport.',hunt:'La photo du jour se cache quelque part en Suisse.',huntk:d=>`Chasse à la photo · Jour ${d}`,huntb:'Chasse à la photo',cmpb:'Activer la boussole',tsd:d=>`${d} décembre`,tsq:'Où allons-nous ?',ago:'Y retourner',loadch:'Chargement de la Suisse',loadpl:'Chargement du lieu',fs:'Plein écran',fsx:'Quitter le plein écran',nofs:'Le plein écran n\'est pas disponible ici : ouvre la carte dans son propre onglet.',rose:'Glisse autour du cadran pour tourner, clique pour revenir au nord',rotl:'Tourner à gauche',rotr:'Tourner à droite',toHz:'Vue rasante',colday:n=>`Sa couleur se révélera le ${n} décembre.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Un autre indice (${i}/${n})`,tip:'Suis la boussole : elle montre la direction et la distance. Quand elle devient rouge, zoome tout près et cherche l\'appareil photo.',heat:['Glacial','Froid','Frais','Tiède','Chaud','Brûlant','Brûlant, zoome encore'],gauge:d=>`Photo du jour ${d}`,toward:['vers le nord','vers le nord-est',"vers l'est",'vers le sud-est','vers le sud','vers le sud-ouest',"vers l'ouest",'vers le nord-ouest'],dist:k=>k>100?'à plus de 100 km':k<1?'à moins d\'1 km':`à environ ${k} km`,go:'Ouvrir le calendrier',
+  itag:'Calendrier de l\'Avent',ih:'Pour Angie',i1:'Chaque jour jusqu\'à Noël, une porte s\'ouvre sur un endroit de Suisse où je veux t\'emmener quand tu seras là.',i2:'Chaque jour, une photo de nous se cache aussi quelque part en Suisse. Des indices et un thermomètre chaud/froid t\'aident à la trouver. Chaque lieu te donne un tampon dans ton passeport, et chaque photo une lettre du message et une place dans l\'album.',hunt:'La photo du jour se cache quelque part en Suisse.',huntk:d=>`Chasse à la photo · Jour ${d}`,huntb:'Chasse à la photo',cmpb:'Activer la boussole',tsd:d=>`${d} décembre`,tsq:'Où allons-nous ?',ago:'Y retourner',loadch:'Chargement de la Suisse',loadpl:'Chargement du lieu',fs:'Plein écran',fsx:'Quitter le plein écran',nofs:'Le plein écran n\'est pas disponible ici : ouvre la carte dans son propre onglet.',rose:'Glisse autour du cadran pour tourner, clique pour revenir au nord',rotl:'Tourner à gauche',rotr:'Tourner à droite',toHz:'Vue rasante',colday:n=>`Sa couleur se révélera le ${n} décembre.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Un autre indice (${i}/${n})`,tip:'Suis la boussole : elle montre la direction et la distance. Quand elle devient rouge, zoome tout près et cherche l\'appareil photo.',heat:['Glacial','Froid','Frais','Tiède','Chaud','Brûlant','Brûlant, zoome encore'],gauge:d=>`Photo du jour ${d}`,toward:['vers le nord','vers le nord-est',"vers l'est",'vers le sud-est','vers le sud','vers le sud-ouest',"vers l'ouest",'vers le nord-ouest'],dist:k=>k>100?'à plus de 100 km':k<1?'à moins d\'1 km':`à environ ${k} km`,go:'Ouvrir le calendrier',
   day:'Jour',again:'Revoir le lieu',overview:'Vue d\'ensemble',dirs:['au nord','au nord-est',"à l'est",'au sud-est','au sud','au sud-ouest',"à l'ouest",'au nord-ouest'],
   clue:(m,d)=>`<strong>Une photo de nous se cache par ici.</strong> Environ ${m} m ${d} du monument. Il faudra zoomer très près pour la voir.`,
   got:l=>`<strong>Photo trouvée.</strong> Ta lettre : ${l}`,ph:d=>`Ici, notre photo n°${d} et un petit mot`,letter:'Lettre trouvée',cont:'Continuer',
   wait:d=>`Patience : cette case s'ouvre le ${d} déc.`,locked:d=>`${d} déc.`,zoomlim:'Le zoom détaillé est réservé aux lieux du calendrier',
-  prev:'Aperçu',snow:'Neige : jour',reset:'Réinitialiser',pzt:'Le message',pzp:'Glisse les lettres dans les cases. Chaque couleur de case est un mot, et la couleur d\'une lettre se révèle 5 jours après sa découverte.',none:'Pas encore de lettre : trouve les photos cachées.',clear:'Tout retirer',close:'Fermer',wrong:'Pas encore, essaie un autre ordre',win:'Joyeux Noël, mon amour.',
+  prev:'Aperçu',snow:'Jour simulé',openme:'Ouvre-moi !',huntnow:'Et maintenant, trouve notre photo !',acs:'NOTRE SUISSE',reset:'Réinitialiser',pzt:'Le message',pzp:'Glisse les lettres dans les cases. Chaque couleur de case est un mot, et la couleur d\'une lettre se révèle 5 jours après sa découverte.',none:'Pas encore de lettre : trouve les photos cachées.',clear:'Tout retirer',close:'Fermer',wrong:'Pas encore, essaie un autre ordre',win:'Joyeux Noël, mon amour.',
   ppc:'PASSEPORT',pps:'NOTRE SUISSE',pph:'Visas',tomorrow:'À demain !',next:'Une autre porte t\'attend',xmas:'Joyeux Noël !',loading:'Chargement de la carte…'},
  en:{title:'Our Switzerland',msg:'The message',pass:'Passport',alb:'Photo album',pfound:'Photo found',pmiss:'Photo to find',albnone:'Not found yet',back:'Back',to2d:'Top view',to3d:'3D view',
-  itag:'Advent calendar',ih:'For Angie',i1:'Every day until Christmas, a door opens on a place in Switzerland where I want to take you once you\'re here.',i2:'Every day, a photo of us is also hidden somewhere in Switzerland. Hints and a hot/cold thermometer help you find it. Each photo gives you a letter and a stamp in your passport.',hunt:'Today\'s photo is hidden somewhere in Switzerland.',huntk:d=>`Photo hunt · Day ${d}`,huntb:'Photo hunt',cmpb:'Turn on the compass',tsd:d=>`December ${d}`,tsq:'Where are we off to?',ago:'Take me back there',loadch:'Loading Switzerland',loadpl:'Loading the place',fs:'Full screen',fsx:'Exit full screen',nofs:'Full screen isn\'t available here: open the map in its own tab.',rose:'Drag around the dial to turn, click to face north',rotl:'Turn left',rotr:'Turn right',toHz:'Horizon view',colday:n=>`Its colour will show on December ${n}.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Another hint (${i}/${n})`,tip:'Follow the compass: it shows the direction and the distance. When it turns red, zoom right in and look for the camera.',heat:['Freezing','Cold','Cool','Warm','Hot','Burning','Burning, zoom in more'],gauge:d=>`Day ${d} photo`,toward:['to the north','to the north-east','to the east','to the south-east','to the south','to the south-west','to the west','to the north-west'],dist:k=>k>100?'more than 100 km away':k<1?'less than 1 km away':`about ${k} km away`,go:'Open the calendar',
+  itag:'Advent calendar',ih:'For Angie',i1:'Every day until Christmas, a door opens on a place in Switzerland where I want to take you once you\'re here.',i2:'Every day, a photo of us is also hidden somewhere in Switzerland. Hints and a hot/cold thermometer help you find it. Each place gives you a stamp in your passport, and each photo a letter of the message and a spot in the album.',hunt:'Today\'s photo is hidden somewhere in Switzerland.',huntk:d=>`Photo hunt · Day ${d}`,huntb:'Photo hunt',cmpb:'Turn on the compass',tsd:d=>`December ${d}`,tsq:'Where are we off to?',ago:'Take me back there',loadch:'Loading Switzerland',loadpl:'Loading the place',fs:'Full screen',fsx:'Exit full screen',nofs:'Full screen isn\'t available here: open the map in its own tab.',rose:'Drag around the dial to turn, click to face north',rotl:'Turn left',rotr:'Turn right',toHz:'Horizon view',colday:n=>`Its colour will show on December ${n}.`,pics:(i,n)=>`${i} / ${n}`,more:(i,n)=>`Another hint (${i}/${n})`,tip:'Follow the compass: it shows the direction and the distance. When it turns red, zoom right in and look for the camera.',heat:['Freezing','Cold','Cool','Warm','Hot','Burning','Burning, zoom in more'],gauge:d=>`Day ${d} photo`,toward:['to the north','to the north-east','to the east','to the south-east','to the south','to the south-west','to the west','to the north-west'],dist:k=>k>100?'more than 100 km away':k<1?'less than 1 km away':`about ${k} km away`,go:'Open the calendar',
   day:'Day',again:'Fly back',overview:'Whole map',dirs:['north','north-east','east','south-east','south','south-west','west','north-west'],
   clue:(m,d)=>`<strong>A photo of us is hidden around here.</strong> About ${m} m ${d} of the landmark. You'll need to zoom in very close to spot it.`,
   got:l=>`<strong>Photo found.</strong> Your letter: ${l}`,ph:d=>`Our photo no. ${d} and a little note go here`,letter:'Letter found',cont:'Continue',
   wait:d=>`Patience: this door opens on Dec ${d}`,locked:d=>`Dec ${d}`,zoomlim:'Close-up zoom is saved for the calendar places',
-  prev:'Preview',snow:'Snow: day',reset:'Reset',pzt:'The message',pzp:'Drag the letters into the slots. Each slot colour is a word, and a letter\'s own colour shows up 5 days after you find it.',none:'No letters yet: find the hidden photos.',clear:'Clear all',close:'Close',wrong:'Not yet, try another order',win:'Merry Christmas, my love.',
+  prev:'Preview',snow:'Simulated day',openme:'Open me!',huntnow:'Now go find our photo!',acs:'OUR SWITZERLAND',reset:'Reset',pzt:'The message',pzp:'Drag the letters into the slots. Each slot colour is a word, and a letter\'s own colour shows up 5 days after you find it.',none:'No letters yet: find the hidden photos.',clear:'Clear all',close:'Close',wrong:'Not yet, try another order',win:'Merry Christmas, my love.',
   ppc:'PASSPORT',pps:'OUR SWITZERLAND',pph:'Visas',tomorrow:'See you tomorrow!',next:'Another door is waiting',xmas:'Merry Christmas!',loading:'Loading the map…'}};
 const t=()=>T[st.lang];
 const PHRASE=()=>DATA.phrase[st.lang],LETTERS=()=>PHRASE().replace(/ /g,'');
@@ -436,8 +470,9 @@ const letterOf=d=>LETTERS()[PERM[d-1]];
 const colorOf=d=>WC[WORDOF()[PERM[d-1]]];
 const L=x=>st.lang==='en'?x.en:x;
 const nyDate=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-const unlocked=d=>PREVIEW||nyDate()>=`2026-12-${String(d).padStart(2,'0')}`;
-const isToday=d=>!PREVIEW&&nyDate()===`2026-12-${String(d).padStart(2,'0')}`;
+const simDay=()=>PREVIEW&&st.snowPrev!=null?st.snowPrev:null;
+const unlocked=d=>{const s=simDay();if(s!=null)return d<=s;return PREVIEW||nyDate()>=`2026-12-${String(d).padStart(2,'0')}`};
+const isToday=d=>{const s=simDay();if(s!=null)return d===s;return !PREVIEW&&nyDate()===`2026-12-${String(d).padStart(2,'0')}`};
 const toast=m=>{const e=$('toast');e.textContent=m;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),2800)};
 const svg=(k,extra='')=>`<svg viewBox="0 0 64 64" aria-hidden="true" ${extra}>${ART[k]||''}</svg>`;
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -469,16 +504,18 @@ function drawTexts(){
   set('cgo',t().again);set('cswiss',t().overview);set('mlt',t().letter);set('mclose',t().cont);set('ppclose',t().close);set('ppc',t().ppc);set('pps',t().pps);
   set('prevt',t().prev);set('snowl',t().snow);set('reset',t().reset);set('pzt',t().pzt);set('pzp',t().pzp);set('pzclear',t().clear);set('pzclose',t().close);
   document.querySelectorAll('.flag b').forEach(b=>b.textContent=b.dataset[st.lang]);
-  drawCounts();drawStrip();if(cur)showCard(cur);if(map)heat();if($('pz').classList.contains('show'))drawPuzzle();
+  drawCounts();drawStrip();if(cur){if($('card').classList.contains('show'))showCard(cur);else if($('hunt').classList.contains('show')&&stamped(cur.d))showHunt(cur)}if(map)heat();if($('pz').classList.contains('show'))drawPuzzle();
 }
-function drawCounts(){set('bmsgn',st.found.length+'/24');set('bpassn',st.found.length)}
+function drawCounts(){set('bmsgn',st.found.length+'/24');set('bpassn',st.stamped.length)}
 function drawStrip(){
   $('strip').innerHTML=DAYS.map(x=>{
     const u=unlocked(x.d),o=st.opened.includes(x.d);
     return `<button class="door${o?' open':''}${u?'':' locked'}${u&&!o&&isToday(x.d)?' today':''}" data-d="${x.d}" aria-label="${esc(t().day+' '+x.d)}">
       <span class="in">${o?`<span class="dn">${x.d}</span>${svg(DATA.dayicon[x.d],'class="di"')}<span class="nm">${esc(L(x).name.split(',')[0])}</span><span class="pb ${st.found.includes(x.d)?'ok':''}" title="${esc(st.found.includes(x.d)?t().pfound:t().pmiss)}">${st.found.includes(x.d)?'✓':CAMS}</span>`:''}</span>
-      <span class="leaf"><span class="num">${x.d}</span><small>${u?'':esc(t().locked(x.d))}</small></span></button>`}).join('');
+      <span class="leaf"><span class="num">${x.d}</span>${u?'':LOCK}<small>${u?(u&&!o&&isToday(x.d)?esc(t().openme):''):esc(t().locked(x.d))}</small></span></button>`}).join('');
+  if(!drawStrip.did){drawStrip.did=1;const td=document.querySelector('.door.today');if(td)requestAnimationFrame(()=>td.scrollIntoView({inline:'center',block:'nearest'}))}
 }
+const LOCK='<svg class="lk" viewBox="0 0 11 13" aria-hidden="true"><path d="M2.6 6V4.3a2.9 2.9 0 0 1 5.8 0V6" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x=".5" y="5.6" width="10" height="7" rx="1.6" fill="currentColor"/></svg>';
 function polPos(x){const r=x.dist/1000,b=x.bear*Math.PI/180;return[x.lon+r*Math.sin(b)/(111.32*Math.cos(x.lat*Math.PI/180)),x.lat+r*Math.cos(b)/110.57]}
 const clue=x=>{if(st.found.includes(x.d))return t().got(esc(letterOf(x.d)));
   if(x.photo){const H=x.photo.hints[st.lang],n=Math.min(H.length,Math.max(1,(st.hints||{})[x.d]||1));
@@ -515,8 +552,13 @@ function showCard(x){if(cur!==x)gi=0;cur=x;setTimeout(heat,0);const R=x.rich&&x.
     +(R.why?`<div class="why"><h3>${esc(R.why[0])}</h3><p>${esc(R.why[1])}</p></div>`:'')
     :`<p>${esc(L(x).text)}</p>`;
   if(x.gallery)galShow(gi);set('chunt',t().huntb);
-  $('card').scrollTop=0;$('card').classList.add('show');document.body.classList.add('cardopen');showHunt(x)}
-$('chunt').onclick=()=>{$('card').classList.remove('show');document.body.classList.remove('cardopen');$('hunt').classList.remove('min')};
+  $('card').scrollTop=0;$('card').classList.add('show');document.body.classList.add('cardopen');if(stamped(x.d))showHunt(x);else $('hunt').classList.remove('show')}
+$('chunt').onclick=()=>{if(!closeCard())$('hunt').classList.remove('min')};
+/* fermer la fiche : la 1re fois, le tampon du lieu arrive dans le passeport, puis la chasse à la photo commence */
+function closeCard(){const was=$('card').classList.contains('show');$('card').classList.remove('show');document.body.classList.remove('cardopen');
+  const x=cur;if(!was||!x||flying||!st.opened.includes(x.d)||stamped(x.d))return false;
+  st.stamped.push(x.d);save();drawCounts();pendingHunt=st.found.includes(x.d)?null:x.d;ac();openPassport(x.d);return true}
+function startHunt(d){const x=DAYS[d-1];if(!x)return;cur=x;addPol(x);if(!flying){showHunt(x);$('hunt').classList.remove('min');$('hmin').textContent='−'}heat()}
 
 /* ---------- le message (couleur par mot) ---------- */
 const pzState=()=>{const s=st.pz[st.lang];if(Array.isArray(s)&&s.length===24)return s;return st.pz[st.lang]=Array(24).fill(null)};
@@ -560,7 +602,7 @@ $('bmsg').onclick=()=>{drawPuzzle();$('pz').classList.add('show')};
 /* ---------- passeport ---------- */
 const INKS=['#2f4f9e','#a3192b','#2e7d4f','#6b3fa0'];
 function stampHTML(d,fresh,hide){
-  const x=DAYS[d-1];if(hide||!st.found.includes(d)&&!fresh)return `<div class="stamp e">${d}</div>`;
+  const x=DAYS[d-1];if(hide||!stamped(d)&&!fresh)return `<div class="stamp e">${d}</div>`;
   const r=((d*37)%24)-12;return `<div class="stamp${fresh?' slam':''}" style="--ink-s:${INKS[d%4]};--r:${r}deg">${svg(DATA.dayicon[d])}<span>${esc(L(x).name.split(',')[0].slice(0,16))}</span><span>${d}.12</span></div>`;
 }
 function drawPassport(fresh,hide){$('ppage').innerHTML=`<h3>${esc(t().pph)}</h3>`+DAYS.map(x=>stampHTML(x.d,x.d===fresh,x.d===hide)).join('')}
@@ -571,11 +613,15 @@ function openPassport(fresh){
     setTimeout(()=>{drawPassport(fresh);thump()},1500);
     setTimeout(()=>book.classList.remove('open'),3000);
     setTimeout(()=>coverMsg(fresh),3700);
-  }else{drawPassport(fresh||null);book.classList.add('open');$('pp').classList.add('show');if(fresh){thump();$('ppmsg').textContent=fresh===24?t().xmas:(unlocked(fresh+1)?t().next:t().tomorrow)}}
+  }else{drawPassport(fresh||null);book.classList.add('open');$('pp').classList.add('show');if(fresh){thump();$('ppmsg').textContent=t()[endKey(fresh)]}}
 }
-function coverMsg(d){const k=d===24?'xmas':(unlocked(d+1)?'next':'tomorrow');$('cvmsg').innerHTML=`<span>${esc(T.fr[k])}</span><span>${esc(T.en[k])}</span>`;$('cvmsg').classList.add('on')}
-function drawAlbum(){$('al').querySelector('.album').classList.remove('viewing');$('aview').hidden=true;$('agrid').hidden=false;
+/* message de fin : chasse à la photo si elle reste à trouver, sinon « à demain » / « une autre porte » / « joyeux Noël » */
+const nextKey=d=>d===24?'xmas':(unlocked(d+1)&&!st.opened.includes(d+1)?'next':'tomorrow');
+const endKey=d=>st.found.includes(d)?nextKey(d):'huntnow';
+function coverMsg(d){const k=endKey(d);$('cvmsg').innerHTML=`<span>${esc(T.fr[k])}</span><span>${esc(T.en[k])}</span>`;$('cvmsg').classList.add('on')}
+function drawAlbum(slot){$('al').querySelector('.album').classList.remove('viewing');$('aview').hidden=true;$('agrid').hidden=false;$('almsg').textContent='';
   $('agrid').innerHTML=DAYS.map(x=>{const f=st.found.includes(x.d),r=((x.d*29)%10)-5;
+    if(x.d===slot)return `<div class="acell slot" style="--r:${r}deg" data-slot="${x.d}"><span class="im"></span><span>${x.d}.12</span></div>`;
     if(!f)return `<div class="acell e"><span class="im">${x.d}</span><span>${esc(t().albnone)}</span></div>`;
     const im=x.photo?`<span class="im" style="background-image:url('${esc(x.photo.src)}')"></span>`:'<span class="im ph"></span>';
     return `<button class="acell" style="--r:${r}deg" data-d="${x.d}">${im}<span>${x.d}.12</span></button>`}).join('')}
@@ -599,9 +645,32 @@ function fsUpd(){const on=!!fsEl();$('fsp').setAttribute('d',on?'M12 5v7H5M20 5v
 $('bfs').onclick=async()=>{try{if(fsEl())await(document.exitFullscreen||document.webkitExitFullscreen).call(document);else{const r=document.documentElement;await(r.requestFullscreen||r.webkitRequestFullscreen).call(r)}}catch(e){toast(t().nofs)}setTimeout(fsUpd,300)};
 document.addEventListener('fullscreenchange',fsUpd);document.addEventListener('webkitfullscreenchange',fsUpd);fsUpd();
 $('balb').onclick=()=>{set('aback',t().back);drawAlbum();$('al').classList.add('show')};
-$('alclose').onclick=()=>$('al').classList.remove('show');
+$('alclose').onclick=()=>{albTok++;$('al').classList.remove('show');$('acover').hidden=true;document.querySelectorAll('.acell.fly').forEach(e=>e.remove())};
+/* photo trouvée : l'album s'ouvre, la photo vole jusqu'à sa case et s'y colle */
+let albTok=0;
+function albumStick(d){const x=DAYS[d-1],tok=++albTok;set('aback',t().back);set('acb',t().alb);set('acs',t().acs);
+  const cv=$('acover');drawAlbum(d);$('al').classList.add('show');
+  const fin=()=>{if(tok!==albTok)return;drawAlbum();const c=$('agrid').querySelector(`[data-d="${d}"]`);if(c){c.classList.add('stuck');c.scrollIntoView({block:'nearest'})}thump();$('almsg').textContent=t()[nextKey(d)]};
+  if(reduce){cv.hidden=true;fin();return}
+  cv.classList.remove('open');cv.hidden=false;void cv.offsetWidth;
+  setTimeout(()=>{if(tok===albTok)cv.classList.add('open')},350);
+  setTimeout(()=>{if(tok!==albTok)return;cv.hidden=true;
+    const s=$('agrid').querySelector('[data-slot]');if(!s){fin();return}
+    s.scrollIntoView({block:'center'});
+    requestAnimationFrame(()=>{if(tok!==albTok)return;const b=s.getBoundingClientRect(),w=s.offsetWidth,h=s.offsetHeight,cx=b.left+b.width/2,cy=b.top+b.height/2;
+      const f=document.createElement('div');f.className='acell fly';f.style.cssText=`left:${cx-w/2}px;top:${cy-h/2}px;width:${w}px;height:${h}px`;
+      f.innerHTML=(x.photo?`<span class="im" style="background-image:url('${esc(x.photo.src)}')"></span>`:'<span class="im ph"></span>')+`<span>${d}.12</span>`;
+      document.body.appendChild(f);
+      const k=Math.min(innerWidth*.62,innerHeight*.55,420)/w,dx=innerWidth/2-cx,dy=innerHeight/2-cy,r=((d*29)%10)-5;
+      const a=f.animate([
+        {transform:`translate(${dx}px,${dy}px) scale(${k}) rotate(-8deg)`,boxShadow:'0 30px 60px rgba(0,0,0,.45)'},
+        {transform:`translate(${dx}px,${dy}px) scale(${k*1.03}) rotate(-5deg)`,offset:.28},
+        {transform:`translate(0,0) scale(1.18) rotate(${r+4}deg)`,boxShadow:'0 14px 26px rgba(0,0,0,.35)',offset:.82},
+        {transform:`translate(0,0) scale(1) rotate(${r}deg)`,boxShadow:'0 2px 8px rgba(0,0,0,.2)'}],
+        {duration:1700,easing:'cubic-bezier(.45,.05,.25,1)',fill:'forwards'});
+      a.onfinish=()=>{f.remove();fin()}})},1500)}
 $('bpass').onclick=()=>{ac();openPassport(null)};
-$('ppclose').onclick=()=>$('pp').classList.remove('show');
+$('ppclose').onclick=()=>{$('pp').classList.remove('show');if(pendingHunt){const d=pendingHunt;pendingHunt=null;startHunt(d)}};
 
 /* ---------- carte ---------- */
 const narrow=Math.min(1,innerWidth/1000);
@@ -759,21 +828,23 @@ function addDay(x,hide){
   const el=document.createElement('button');el.className='mon'+(hide?' hid':'');el.setAttribute('aria-label',x.d+', '+x.name);el.innerHTML=`<b class="mi">${svg(DATA.dayicon[x.d])}<span>${x.d}</span></b>`;
   el.onclick=e=>{e.stopPropagation();showCard(x);fly(x)};
   mons[x.d]=new maplibregl.Marker({element:el,anchor:'bottom',opacityWhenCovered:'1'}).setLngLat([x.lon,x.lat]).addTo(map);
-  if(st.found.includes(x.d))return;
+  addPol(x)}
+function addPol(x){
+  if(!map||pols[x.d]||st.found.includes(x.d)||!stamped(x.d))return;
   const p=document.createElement('button');p.className=x.photo?'cam':'pol';p.setAttribute('aria-label','Photo');p.innerHTML=x.photo?'<i>'+CAM+'</i>':'<i></i>';
   p.onclick=e=>{e.stopPropagation();findPhoto(x)};
   pols[x.d]=new maplibregl.Marker({element:p,anchor:'bottom',opacityWhenCovered:'1'}).setLngLat(x.photo?[x.photo.lon,x.photo.lat]:polPos(x)).addTo(map);
 }
-let pendingStamp=null;
+let pendingAlbum=null,pendingHunt=null;
 function findPhoto(x){
   ac();const fresh=!st.found.includes(x.d);
   if(fresh){st.found.push(x.d);st.foundOn=st.foundOn||{};st.foundOn[x.d]=todayNum();save()}
   pols[x.d]&&pols[x.d].remove();delete pols[x.d];
   const ph=$('mph');ph.classList.toggle('photo',!!x.photo);if(x.photo){ph.innerHTML=`<img src="${esc(x.photo.src)}" alt="">`;$('mt').textContent=x.photo.cap[st.lang]}else{ph.textContent=t().ph(x.d);$('mt').textContent=L(x).name}$('ml').textContent=letterOf(x.d);$('ml').style.setProperty('--c',tcol(x.d));$('mlc').textContent=shown(x.d)?'':t().colday(foundOn(x.d)+5);
   $('modal').querySelector('.polaroid').classList.toggle('big',!!x.photo);$('modal').classList.add('show');drawCounts();drawStrip();heat();if(cur&&cur.d===x.d)$('cc').innerHTML=clue(x);
-  pendingStamp=fresh?x.d:null;
+  pendingAlbum=fresh?x.d:null;
 }
-$('mclose').onclick=()=>{$('modal').classList.remove('show');if(pendingStamp){const d=pendingStamp;pendingStamp=null;openPassport(d)}};
+$('mclose').onclick=()=>{$('modal').classList.remove('show');if(pendingAlbum){const d=pendingAlbum;pendingAlbum=null;albumStick(d)}};
 function openDay(d){
   const x=DAYS[d-1];ac();
   if(!unlocked(d)){toast(t().wait(d));return}
@@ -785,8 +856,8 @@ function openDay(d){
   setTimeout(()=>{if(first)drawStrip()},1000);
 }
 /* chaud / froid */
-function target(){if(cur&&cur.photo&&st.opened.includes(cur.d)&&!st.found.includes(cur.d))return cur;
-  return [...st.opened].sort((a,b)=>b-a).map(d=>DAYS[d-1]).find(x=>x.photo&&!st.found.includes(x.d))||null}
+function target(){if(cur&&cur.photo&&stamped(cur.d)&&!st.found.includes(cur.d))return cur;
+  return [...st.stamped].sort((a,b)=>b-a).map(d=>DAYS[d-1]).find(x=>x.photo&&!st.found.includes(x.d))||null}
 const CAM='<svg viewBox="0 0 64 64"><circle cx="32" cy="34" r="30" fill="#fff"/><rect x="8" y="20" width="48" height="32" rx="7" fill="#d52b1e"/><path d="M22 20l4-7h12l4 7z" fill="#a91d13"/><rect x="44" y="24" width="7" height="4" rx="1" fill="#f2c230"/><circle cx="32" cy="36" r="12" fill="#fff"/><circle cx="32" cy="36" r="8.5" fill="#1f2a1f"/><circle cx="29" cy="33" r="2.5" fill="#fff" opacity=".8"/><path d="M14 27c0-2 3-2 3 0 0-2 3-2 3 0 0 2.5-3 4-3 5 0-1-3-2.5-3-5z" fill="#fff"/></svg>';
 const CAMS='<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="4" width="14" height="10" rx="2" fill="#9aa3ab"/><rect x="5" y="2" width="6" height="3" rx="1" fill="#9aa3ab"/><circle cx="8" cy="9" r="3" fill="#fff"/></svg>';
 const HC=['#2f6fd6','#56a0d3','#45b3b8','#e0a800','#f28c28','#d52b1e'];
@@ -850,16 +921,17 @@ fetch('manifest.json').then(r=>r.json()).then(m=>{MAN=m;return fetch('style.json
 
 $('strip').addEventListener('click',e=>{const b=e.target.closest('.door');if(b)openDay(+b.dataset.d)});
 const hovered=new Set();$('strip').addEventListener('pointerover',e=>{const b=e.target.closest('.door');if(!b)return;const d=+b.dataset.d;if(hovered.has(d)||!unlocked(d))return;hovered.add(d);prefetch(DAYS[d-1],false)});
-$('cx').onclick=()=>{$('card').classList.remove('show');document.body.classList.remove('cardopen')};
+$('cx').onclick=()=>closeCard();
 $('cgo').onclick=()=>cur&&fly(cur);
-$('cswiss').onclick=()=>{$('card').classList.remove('show');document.body.classList.remove('cardopen');map.setMaxZoom(11.99);map.flyTo({...HOME,padding:{top:0,bottom:0,left:0,right:0},duration:2600})};
+$('cswiss').onclick=()=>{closeCard();map.setMaxZoom(11.99);map.flyTo({...HOME,padding:{top:0,bottom:0,left:0,right:0},duration:2600})};
 $('go').onclick=()=>{$('intro').remove();st.intro=true;save();ac()};
 $('lfr').onclick=()=>{st.lang='fr';save();drawTexts()};
 $('len').onclick=()=>{st.lang='en';save();drawTexts()};
 if(st.intro)$('intro').remove();
-if(PREVIEW){$('prev').classList.add('show');const r=$('snowr');r.value=snowDay();r.oninput=()=>{st.snowPrev=+r.value;save();applySnow()};
-  $('reset').onclick=()=>{st={opened:[],found:[],intro:true,lang:st.lang,solved:{},pz:{},snowPrev:null};save();location.reload()}}
-addEventListener('keydown',e=>{if(e.key==='Escape'){if($('lbm').classList.contains('show')){$('lbm').classList.remove('show');return}['modal','pz','pp','al','card'].forEach(id=>$(id).classList.remove('show'));document.body.classList.remove('cardopen')}});
+if(PREVIEW){$('prev').classList.add('show');const r=$('snowr'),sv=()=>$('snowv').textContent=st.snowPrev??'–';r.value=st.snowPrev??24;sv();r.oninput=()=>{st.snowPrev=+r.value;save();applySnow();drawStrip();sv()};
+  $('reset').onclick=()=>{st={opened:[],found:[],stamped:[],intro:true,lang:st.lang,solved:{},pz:{},snowPrev:null};save();location.reload()}}
+addEventListener('keydown',e=>{if(e.key==='Escape'){if($('lbm').classList.contains('show')){$('lbm').classList.remove('show');return}if($('modal').classList.contains('show')){$('mclose').click();return}if($('pp').classList.contains('show')){$('ppclose').click();return}if($('al').classList.contains('show')){$('alclose').click();return}
+  ['pz'].forEach(id=>$(id).classList.remove('show'));if($('card').classList.contains('show'))closeCard()}});
 $('vlp').textContent=t().loading;
 drawTexts();
 const td=DAYS.find(x=>isToday(x.d));if(td)setTimeout(()=>document.querySelector(`.door[data-d="${td.d}"]`).scrollIntoView({inline:'center',behavior:'smooth'}),400);
